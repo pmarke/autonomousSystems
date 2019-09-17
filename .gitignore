@@ -31,4 +31,4 @@
 *.out
 *.app
 
-1_kf/build/*
+build/*
