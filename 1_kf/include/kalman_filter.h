@@ -81,6 +81,12 @@ public:
   // Return a pointer to the discrete process noise
   const Eigen::MatrixXf* GetProcessNoiseCovDiscrete();
 
+  // Return a pointer to the Kalman gain
+  const Eigen::MatrixXf* GetKalmanGain();
+
+  // Return a pointer to the error covariance
+  const Eigen::MatrixXf* GetErrorCovariance();
+
   // Transforms the system from continuous to discrete
   void Discretize(float Ts);
 
@@ -106,6 +112,7 @@ private:
   Eigen::MatrixXf Qd_;      // System Covariance discrete
   Eigen::MatrixXf Gc_;      // Process Noise Matrix Continuous
   Eigen::MatrixXf Gd_;      // Process Noise Matrix
+  Eigen::MatrixXf K_;       // Kalman Gain
 
   bool cont_sys_;                 // flag to indicate that user is using a continous system
   bool need_discretize_;          // flag to indicate that the system needs to be discretized

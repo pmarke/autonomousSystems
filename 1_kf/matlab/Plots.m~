@@ -1,0 +1,25 @@
+log_K= fopen("/tmp/AS_KalmanFilter/k.log","r");
+log_t= fopen("/tmp/AS_KalmanFilter/t.log","r");
+log_x= fopen("/tmp/AS_KalmanFilter/x.log","r");
+log_xh= fopen("/tmp/AS_KalmanFilter/xh.log","r");
+log_u= fopen("/tmp/AS_KalmanFilter/u.log","r");
+log_P= fopen("/tmp/AS_KalmanFilter/P.log","r");
+
+
+
+K_array = reshape(fread(log_K,'float'),2,[]);
+t_array = reshape(fread(log_t,'float'),1,[]);
+x_array = reshape(fread(log_x,'float'),2,[]);
+xh_array = reshape(fread(log_xh,'float'),2,[]);
+u_array = reshape(fread(log_u,'float'),1,[]);
+P_array = reshape(fread(log_P,'float'),2,2,[]);
+
+e_array = x_array - xh_array;
+
+
+figure(1)
+subplot(2,1,1)
+plot(t,x_array(1,:))
+hold on
+plot(t,xh_array(1,:))
+e_array(

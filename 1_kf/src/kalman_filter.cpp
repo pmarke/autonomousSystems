@@ -146,12 +146,12 @@ void KalmanFilter::Predict(float Ts, const Eigen::VectorXf& u)
 
 void KalmanFilter::Update(const Eigen::VectorXf& y)
 {
-  Eigen::MatrixXf K;
+  // Eigen::MatrixXf K;
   Eigen::MatrixXf temp;
   temp = C_*P_*C_.transpose()+R_;
-  K = P_*C_.transpose()*(temp.inverse());
-  x_ = x_+K*(y-C_*x_);
-  P_=(Eigen::MatrixXf::Identity(Ac_.cols(),Ac_.cols()) -K*C_)*P_;
+  K_ = P_*C_.transpose()*(temp.inverse());
+  x_ = x_+K_*(y-C_*x_);
+  P_=(Eigen::MatrixXf::Identity(Ac_.cols(),Ac_.cols()) -K_*C_)*P_;
 }
 
 
@@ -188,7 +188,17 @@ const Eigen::MatrixXf* KalmanFilter::GetProcessNoiseCovDiscrete()
 }
 
 
+// Return a pointer to the Kalman gain
+const Eigen::MatrixXf* KalmanFilter::GetKalmanGain()
+{
+  return &K_;
+}
 
 
+// Return a pointer to the error covariance
+const Eigen::MatrixXf* KalmanFilter::GetErrorCovariance()
+{
+  return &P_;
+}
 
 }
