@@ -1,2 +1,0 @@
-/usr/bin/ar qc libkalman_filter_lib.a  CMakeFiles/kalman_filter_lib.dir/src/kalman_filter.cpp.o
-/usr/bin/ranlib libkalman_filter_lib.a
