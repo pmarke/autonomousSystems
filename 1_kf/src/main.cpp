@@ -63,6 +63,7 @@ int main(int argc, char **argv)
   const Eigen::MatrixXf* K;                   // Kalman Gain
 
   Eigen::Matrix<float,1,1> R{0.001};             // Measurement noise covariance
+  // Eigen::Matrix<float,1,1> R{0.001};             // Measurement noise covariance
   // Eigen::Matrix<float,2,2> P0{Eigen::Matrix<float,2,2>::Zero()};
   Eigen::Matrix<float,2,2> P0{Eigen::Matrix<float,2,2>::Identity()*0};
   const Eigen::MatrixXf* P;
@@ -85,8 +86,8 @@ int main(int argc, char **argv)
   P = k.GetErrorCovariance();
 
   std::default_random_engine generator;
-  std::normal_distribution<double> q11(0,Q(0,0));
-  std::normal_distribution<double> q22(0,Q(1,1));
+  std::normal_distribution<double> q11(0,sqrtf(Q(0,0)));
+  std::normal_distribution<double> q22(0,sqrt(Q(1,1)));
   std::normal_distribution<double> r(0,R(0,0));
 
   Eigen::Matrix<float,2,1> pNoise;
