@@ -66,7 +66,7 @@ float alpha3_ = 0.01;
 float alpha4_ = 0.1;
 
 float sigma_r_= 0.1;
-float sigma_phi_ = 0.05*1;
+float sigma_phi_ = 0.05;
 
 // Time variables
 float t_;         // Current time

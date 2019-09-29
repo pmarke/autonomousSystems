@@ -38,6 +38,7 @@ Q_ << powf(sigma_r_,2), 0, 0, powf(sigma_phi_,2);
 // Initialize true state
 x_ << -5, -3, kPI/2;
 xh_.setZero();
+// xh_<<100000,-100,kPI/2;
 u_.setZero();
 
 t_ = 0;
@@ -195,10 +196,6 @@ void EKF::Step(const Eigen::Vector2f& u, float t, float Ts)
   // Add process noise
   v += sqrt((alpha1_*powf(v,2)+alpha2_*powf(w,2)))*randn_(gen_);
   w += sqrt((alpha3_*powf(v,2)+alpha4_*powf(w,2)))*randn_(gen_);
-  // std::cout << sqrt((alpha3_*powf(v,2)+alpha4_*powf(w,2))) <<std::endl << std::endl;
-  // std::cout << randn_(gen_) <<std::endl << std::endl;
-
-  // std::cout << "in 2" << std::endl;
 
 
   Eigen::Vector3f x_delta; // change in true state
