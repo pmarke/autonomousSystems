@@ -46,7 +46,6 @@ const Eigen::VectorXf* UKF::GetEstimateMeasurement(){return &zh_;}
 void UKF::GenerateSigmaPoints() {
 
   chi_.clear();
-  chi_b_.clear();
 
   // Construct augmented covariance matrix
   unsigned int dim = P_.rows() + Q_.rows() + R_.rows();
@@ -97,21 +96,7 @@ void UKF::GenerateSigmaPoints() {
     // std::cout << "chi: " << i << std::endl << 0*xh_aug+lambda_n*L.col(i) << std::endl << std::endl;
   }
 
-  // std::cout << "u: " << std::endl << u_ << std::endl;
 
-  // Propagate sig points through system dynamics
-  // std::cout << "chi size: " << chi_.size() << std::endl;
-  for (unsigned int j=0; j < chi_.size(); j++)
-  {
-    chi_b_.push_back(f_(chi_[j].head(xh_.rows()),u_+chi_[j].segment(xh_.rows(),u_.rows()),0,false));
-    // std::cout << "chi b: " << j << std::endl << chi_b_[j] << std::endl << std::endl;
-    // std::cout << "chi h: " << j << std::endl << chi_[j].head(xh_.rows()) << std::endl << std::endl;
-
-  }
-
-    // std::cout << "chi: " << chi_[8] << std::endl;
-    // std::cout << "u: " << u_ << std::endl;
-    // std::cout << "u+: " << chi_[8].segment(xh_.rows(),u_.rows());
 
   genSigPoints_ = false;
 
@@ -128,7 +113,17 @@ void UKF::Predict() {
   if (propogateTrue_) 
     x_ = f_(x_,u_,0,true);
 
-  
+
+  chi_b_.clear();
+  for (unsigned int j=0; j < chi_.size(); j++)
+  {
+    chi_b_.push_back(f_(chi_[j].head(xh_.rows()),u_+chi_[j].segment(xh_.rows(),u_.rows()),0,false));
+    // std::cout << "chi b: " << j << std::endl << chi_b_[j] << std::endl << std::endl;
+    // std::cout << "chi h: " << j << std::endl << chi_[j].head(xh_.rows()) << std::endl << std::endl;
+
+  }
+
+
   Eigen::VectorXf mu = weight_m_*chi_b_[0];
 
   // Compute new mean
@@ -141,20 +136,19 @@ void UKF::Predict() {
 
   // Compute new error covariance
   Eigen::MatrixXf P = weight_c_*(chi_b_[0]-mu)*((chi_b_[0]-mu).transpose());
+  chi_[0].head(xh_.rows()) = chi_b_[0];
   // std::cout << "P: predict " << std::endl << P << std::endl;
 
   for (unsigned int j = 1; j < chi_b_.size(); j++)
   {
     P += weight_mc_*(chi_b_[j]-mu)*((chi_b_[j]-mu).transpose());
+    chi_[j].head(xh_.rows()) = chi_b_[j];
   // std::cout << "P: predict " << std::endl << P << std::endl;
   
   }
 
   P_ = P;
-
-  // std::cout << "x_: " << std::endl << x_ << std::endl;
-  // std::cout << "mu: " << std::endl << mu << std::endl;
-  // std::cout << "P: predict " << std::endl << P << std::endl;
+ 
 }
 
 //---------------------------------------------------------------------------
@@ -173,7 +167,7 @@ void UKF::Update() {
 
   // Propagate sigma points though measurment funciton
   for (unsigned int i =0; i < chi_b_.size(); i++)
-    chi_z_.push_back(g_(chi_b_[i],u_,false)+chi_[i].tail(R_.rows()));
+    chi_z_.push_back(g_(chi_[i].head(xh_.rows()),u_,false)+chi_[i].tail(R_.rows()));
 
   // Compute mean and standar deviation of the measurment
 
@@ -187,8 +181,6 @@ void UKF::Update() {
 
   zh_ = Z;
 
-  // std::cout << "zh: " << std::endl << zh_ << std::endl;
-
   // Compute new error covariance
   Eigen::MatrixXf S = weight_c_*(chi_z_[0]-Z)*(chi_z_[0]-Z).transpose();
 
@@ -198,11 +190,11 @@ void UKF::Update() {
   }
 
   // Compute Cross correlation
-  Eigen::MatrixXf Pc = weight_c_*(chi_b_[0]-xh_)*(chi_z_[0]-Z).transpose();
+  Eigen::MatrixXf Pc = weight_c_*(chi_[0].head(xh_.rows())-xh_)*(chi_z_[0]-Z).transpose();
 
   for (unsigned int j = 1; j < chi_z_.size(); j++)
   {
-    Pc += weight_mc_*(chi_b_[j]-xh_)*(chi_z_[j]-Z).transpose();
+    Pc += weight_mc_*(chi_[j].head(xh_.rows())-xh_)*(chi_z_[j]-Z).transpose();
   }
 
   K_ = Pc*S.inverse();
@@ -211,6 +203,8 @@ void UKF::Update() {
 
   // std::cout << "zh: " << std::endl << zh_ << std::endl;
   // std::cout << "S: " << std::endl << S << std::endl;
+  // S.inverse();
+  // std::cout << "Si: " << std::endl << S << std::endl;
   // std::cout << "x: " << std::endl << x_ << std::endl;
   // std::cout << "xh: " << std::endl << xh_ << std::endl;
   // std::cout << "P: " << std::endl << P_ << std::endl;

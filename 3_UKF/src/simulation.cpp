@@ -131,7 +131,7 @@ void Sim::InitSystem() {
   zh_= ukf_.GetEstimateMeasurement();
   ukf_.SetSystemFunctionPointer(std::bind(&Sim::SystemFunction, this, _1, _2,_3,_4));
   ukf_.SetMeasurementFunctionPointer(std::bind(&Sim::MeasFunction, this, _1, _2,_3));
-  ukf_.SetWeightParameters(0.25,50,2);
+  ukf_.SetWeightParameters(0.15,50,2);
 
 
 }
@@ -181,6 +181,8 @@ Eigen::VectorXf Sim::MeasFunction(const Eigen::VectorXf&  x, const Eigen::Vector
   else
     z << sqrt(q) ,atan2(my-py,mx-px)-th;
 
+  // std::cout << "id: " << id_ << std::endl;
+
   return z;
 }
 
@@ -208,18 +210,24 @@ void Sim::Simulate()
   Eigen::Vector2f u;   // input
   Eigen::Matrix2f Q;   // process noise
 
+
+
   while (t_ < tf_)
   {
 
     GetInputAndProcessCovariance(u, Q, t_);
     ukf_.SetProcessCovariance(Q);
     ukf_.SetInput(u);
+    // LogData();
     ukf_.Predict();
 
     for (unsigned int i=0; i < num_landmarks_; i++)
     {
       id_ = i;
-      ukf_.Update();     
+      // std::cout << "id: " << id_ << std::endl;
+
+      ukf_.Update();  
+      LogMeasurement();   
 
     }
 
@@ -237,6 +245,8 @@ void Sim::Simulate()
 
     t_+=Ts_;
 
+    LogData();
+
   }
 
     std::cout << "P: " << std::endl << *P_ << std::endl;
@@ -245,4 +255,24 @@ void Sim::Simulate()
     std::cout << "x: " << std::endl << *x_ << std::endl;
     std::cout << "xh: " << std::endl << *xh_ << std::endl;
 
+}
+
+//---------------------------------------------------------------------------
+
+void Sim::LogData()
+{
+    // log data
+    log_K_.write( (char*) K_->data(),   6*sizeof(float));                
+    log_t_.write( (char*) &t_,          sizeof(float));                 
+    log_x_.write( (char*) x_->data(),  3*sizeof(float));  
+    log_xh_.write( (char*) xh_->data(), 3*sizeof(float));  
+    log_u_.write( (char*) u_->data(),   2*sizeof(float));   
+    log_P_.write( (char*) P_->data(),   9*sizeof(float)); 
+}
+
+//---------------------------------------------------------------------------
+
+void Sim::LogMeasurement()
+{
+  log_m_.write( (char*) z_->data(),   2*sizeof(float));
 }
