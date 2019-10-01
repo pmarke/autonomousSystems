@@ -219,7 +219,7 @@ void Sim::Simulate()
     ukf_.SetProcessCovariance(Q);
     ukf_.SetInput(u);
     // LogData();
-    ukf_.Predict();
+    ukf_.Predict(Ts_);
 
     for (unsigned int i=0; i < num_landmarks_; i++)
     {

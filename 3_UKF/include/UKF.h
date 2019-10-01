@@ -51,7 +51,7 @@ const Eigen::VectorXf* GetEstimateState();
 const Eigen::VectorXf* GetTrueMeasurement();
 const Eigen::VectorXf* GetEstimateMeasurement();
 
-void Predict();
+void Predict(float Ts);
 void Update();
 
 

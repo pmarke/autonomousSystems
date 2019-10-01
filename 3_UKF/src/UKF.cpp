@@ -104,20 +104,20 @@ void UKF::GenerateSigmaPoints() {
 
 //---------------------------------------------------------------------------
 
-void UKF::Predict() {
+void UKF::Predict(float Ts) {
 
   if (genSigPoints_)
     GenerateSigmaPoints();
 
   // Propogate True dynamics if flag is set to true
   if (propogateTrue_) 
-    x_ = f_(x_,u_,0,true);
+    x_ = f_(x_,u_,Ts,true);
 
 
   chi_b_.clear();
   for (unsigned int j=0; j < chi_.size(); j++)
   {
-    chi_b_.push_back(f_(chi_[j].head(xh_.rows()),u_+chi_[j].segment(xh_.rows(),u_.rows()),0,false));
+    chi_b_.push_back(f_(chi_[j].head(xh_.rows()),u_+chi_[j].segment(xh_.rows(),u_.rows()),Ts,false));
     // std::cout << "chi b: " << j << std::endl << chi_b_[j] << std::endl << std::endl;
     // std::cout << "chi h: " << j << std::endl << chi_[j].head(xh_.rows()) << std::endl << std::endl;
 
