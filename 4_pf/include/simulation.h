@@ -32,6 +32,7 @@ void InitSystem();      // Init all system parameters
 Eigen::VectorXf SystemFunction(const Eigen::VectorXf&  x, const Eigen::VectorXf& u, float Ts, bool addNoise);
 Eigen::VectorXf MeasFunction(const Eigen::VectorXf&  x, const Eigen::VectorXf& u, bool addNoise);
 void GetInputAndProcessCovariance(Eigen::Vector2f& u, Eigen::Matrix2f& Q, float t);
+Eigen::Vector2f GetLandmarkPosition();
 
 // Log Data
 void LogData();

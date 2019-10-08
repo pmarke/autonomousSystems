@@ -9,11 +9,13 @@
 #include <experimental/filesystem> 
 #include <fstream>
 #include <functional>
+#include <algorithm>
 
 namespace fs = std::experimental::filesystem;
 
 typedef std::function<Eigen::VectorXf(const Eigen::VectorXf&  x, const Eigen::VectorXf& u, float Ts, bool addNoise)> SysFunPtr;
 typedef std::function<Eigen::VectorXf(const Eigen::VectorXf&  x, const Eigen::VectorXf& u, bool addNoise)> MeasFunPtr;
+
 
 const float kPI = 3.14159;
 
@@ -35,6 +37,7 @@ explicit ParticleFilter(bool propogateTrue, unsigned int M);
     // Set function pointers
     void SetSystemFunctionPointer(SysFunPtr f);
     void SetMeasurementFunctionPointer(MeasFunPtr g);
+    void SetLandmarkLocationPointer(std::function<Eigen::VectorXf()> l_);
 
     const Eigen::VectorXf* GetInput();
     const Eigen::VectorXf* GetTrueState();
@@ -52,6 +55,7 @@ private:
     void InitializeEstimate();
     void Resample();
     float GetWeight(Eigen::Vector2f z, Eigen::Vector2f zh);
+    Eigen::Vector4f GetParticleFromMeas(Eigen::Vector2f zh);
 
     bool propogateTrue_;
     unsigned int M_;
@@ -67,6 +71,13 @@ private:
     Eigen::VectorXf* zh_;   // Estimated Measurement
     Eigen::Matrix2f R_;
     float ExpConst_;
+    float t_=0;
+
+    float alpha_slow_=0.01;
+    float alpha_fast = 0.1;
+    float w_slow_ = 0;
+    float w_fast_ = 0;
+    float w_t_ = 0;
 
     // Pointer to the system function
     // x is the state of the system
@@ -76,9 +87,12 @@ private:
     // Pointer to the measurement function
     MeasFunPtr g_;
 
+    std::function<Eigen::VectorXf()> GetLandmarkLocation_;
+
     std::default_random_engine gen_;
     std::uniform_real_distribution<float> uniform_x_{-20,20};
     std::uniform_real_distribution<float> uniform_y_{-20,20};
-    std::uniform_real_distribution<float> uniform_th_{0,kPI};
+    std::uniform_real_distribution<float> uniform_th_{0,2*kPI};
+    std::uniform_real_distribution<float> uniform_zero_one_{0, 1};
 
 };

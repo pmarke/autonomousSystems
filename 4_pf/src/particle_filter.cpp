@@ -34,6 +34,7 @@ void ParticleFilter::SetTrueMeasurement(const Eigen::VectorXf& z){z_= z;}
 // Set Function Pointers
 void ParticleFilter::SetSystemFunctionPointer(SysFunPtr f){f_=f;}
 void ParticleFilter::SetMeasurementFunctionPointer(MeasFunPtr g){g_=g;}
+void ParticleFilter::SetLandmarkLocationPointer(std::function<Eigen::VectorXf()> l_) {GetLandmarkLocation_ = l_;}
 
 const Eigen::VectorXf* ParticleFilter::GetInput(){return &u_;}
 const Eigen::VectorXf* ParticleFilter::GetTrueState(){return &x_;}
@@ -62,9 +63,17 @@ void ParticleFilter::InitializeEstimate() {
 
 void ParticleFilter::Predict(float Ts) {
 
+    t_+=Ts;
+//    std::cout << t_ << std::endl;
+
     // Propogate True dynamics if flag is set to true
     if (propogateTrue_)
         x_ = f_(x_,u_,Ts,true);
+
+//    if (std::fabs(t_-10.0)<Ts/2) {
+//      x_ << 10,10,0,0;
+//
+//    }
 
 //    std::cerr << "x_: " << std::endl << x_ << std::endl;
 
@@ -86,7 +95,7 @@ void ParticleFilter::Update() {
     if (propogateTrue_)
         z_ = g_(x_,u_,true);
 
-    float w_t = 0;
+    w_t_ = 0;
     for (unsigned int i=0; i < M_; i++)
     {
         zh_[i] = g_(chi_[i],u_,false);
@@ -99,19 +108,24 @@ void ParticleFilter::Update() {
 //        }
 
 
-          w_t += chi_[i](3);
+      w_t_ += chi_[i](3);
     }
-    for (unsigned int i=0; i < M_; i++)
-    {
-        chi_[i](3) /=w_t;
-//        float weight = chi_[i](3);
-//        if (weight > 0.001) {
-//          std::cerr << "weight: " << std::endl << weight << std::endl;
-//          std::cerr << "chi: " << i << std::endl << chi_[i] << std::endl;
-//
-//        }
+//    std::cerr << "w_t: " << w_t_ << std::endl;
 
-    }
+    w_slow_ += alpha_slow_*(w_t_/static_cast<float>(M_)-w_slow_);
+    w_fast_ += alpha_fast*(w_t_/static_cast<float>(M_)-w_fast_);
+
+//    for (unsigned int i=0; i < M_; i++)
+//    {
+//        chi_[i](3) /=w_t_;
+////        float weight = chi_[i](3);
+////        if (weight > 0.001) {
+////          std::cerr << "weight: " << std::endl << weight << std::endl;
+////          std::cerr << "chi: " << i << std::endl << chi_[i] << std::endl;
+////
+////        }
+//
+//    }
 
 //  std::cerr << "done update: " << std::endl;
 
@@ -126,11 +140,12 @@ void ParticleFilter::Update() {
 
 void ParticleFilter::Resample() {
 
-    std::uniform_real_distribution<float> uniform_r{0, 1/static_cast<float>(M_)};
-    float r = uniform_r(gen_);
+
+
+    float r = uniform_zero_one_(gen_)/static_cast<float>(M_);
 //    std::cerr << "r: " << std::endl << r << std::endl;
 
-
+    chi_[0](3) /=w_t_;
     float c = chi_[0](3);
 //    std::cerr << "c: " << std::endl << c << std::endl;
 
@@ -141,10 +156,18 @@ void ParticleFilter::Resample() {
         U = r + static_cast<float>(j)/M_;
         while (U>c) {
             i++;
-            c += chi_[i](3);
+          chi_[i](3) /=w_t_;
+          c += chi_[i](3);
         }
-        chib_[j] = chi_[i];
-        w_t += chi_[i](3);
+        if (uniform_zero_one_(gen_) < std::max<float>(0.0,1-w_fast_/w_slow_)) {
+          chib_[j]=GetParticleFromMeas(z_);
+          w_t += chib_[j](3);
+        }
+        else {
+          chib_[j] = chi_[i];
+          w_t += chi_[i](3);
+        }
+
 //        std::cerr << "chi: " << std::endl << chi_[i] << std::endl;
 
 
@@ -170,6 +193,25 @@ float ParticleFilter::GetWeight(Eigen::Vector2f z, Eigen::Vector2f zh) {
 //        std::cerr << "inside: " << std::endl << inside << std::endl;
 //      std::cerr << "ExpConst_: " << std::endl << ExpConst_ << std::endl;
 
-  return ExpConst_*exp(inside);
+  return std::max<float>(0.00001,ExpConst_*exp(inside));
+}
+
+//---------------------------------------------------------------------------------------------
+
+Eigen::Vector4f ParticleFilter::GetParticleFromMeas(Eigen::Vector2f zh) {
+
+  Eigen::Vector2f landmark = GetLandmarkLocation_();
+
+  float q = zh(0)+ (uniform_zero_one_(gen_)-0.5)/2.0*R_(0,0);
+  q = std::max<float>(0.001,q);
+  float th = zh(1)+ (uniform_zero_one_(gen_)-0.5)/2.0*R_(1,1);
+  Eigen::Vector2f z_new(q,th);
+
+
+  Eigen::Vector4f x;
+  x << -q*cos(th) +landmark(0), -q*sin(th)+landmark(1), uniform_th_(gen_), GetWeight(z_,z_new);
+//  std::cerr << "here" << std::endl;
+//  std::cerr << "x: " << std::endl << x << std::endl;
+  return x;
 }
 

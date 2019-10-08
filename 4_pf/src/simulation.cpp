@@ -31,20 +31,20 @@ Sim::~Sim()
 
 void Sim::InitLog() {
 
-  std::cout << "Writing log data to /tmp/AS_particle" << std::endl;
+  std::cout << "Writing log data to /home/mark/tmp/AS_particle" << std::endl;
 
   // Make sure the filepath exists
-  if (!fs::exists("/tmp/AS_particle"))
+  if (!fs::exists("/home/mark/tmp/AS_particle"))
   {
-    fs::create_directory("/tmp/AS_particle");
+    fs::create_directory("/home/mark/tmp/AS_particle");
   }
 
-  log_chi_.open("/tmp/AS_particle/chi.log",  std::ofstream::out);
-  log_t_.open("/tmp/AS_particle/t.log",  std::ofstream::out);
-  log_x_.open("/tmp/AS_particle/x.log",  std::ofstream::out);
-  log_xh_.open("/tmp/AS_particle/xh.log",std::ofstream::out);
-  log_u_.open("/tmp/AS_particle/u.log",  std::ofstream::out);
-  log_m_.open("/tmp/AS_particle/m.log",  std::ofstream::out);
+  log_chi_.open("/home/mark/tmp/AS_particle/chi.log",  std::ofstream::out);
+  log_t_.open("/home/mark/tmp/AS_particle/t.log",  std::ofstream::out);
+  log_x_.open("/home/mark/tmp/AS_particle/x.log",  std::ofstream::out);
+  log_xh_.open("/home/mark/tmp/AS_particle/xh.log",std::ofstream::out);
+  log_u_.open("/home/mark/tmp/AS_particle/u.log",  std::ofstream::out);
+  log_m_.open("/home/mark/tmp/AS_particle/m.log",  std::ofstream::out);
 
   log_m_.write( (char*) &num_landmarks_,   sizeof(int));
 }
@@ -118,6 +118,7 @@ void Sim::InitSystem() {
   chi_ = pf_.GetParticles();
   pf_.SetSystemFunctionPointer(std::bind(&Sim::SystemFunction, this, _1, _2,_3,_4));
   pf_.SetMeasurementFunctionPointer(std::bind(&Sim::MeasFunction, this, _1, _2,_3));
+  pf_.SetLandmarkLocationPointer(std::bind(&Sim::GetLandmarkPosition, this));
 
 
 }
@@ -142,6 +143,7 @@ Eigen::VectorXf Sim::SystemFunction(const Eigen::VectorXf&  x, const Eigen::Vect
   x_delta << -v/w*sin(th) + v/w*sin(th+w*Ts), 
             v/w*cos(th) - v/w*cos(th+w*Ts),
             w*Ts,0;
+
 
   return x + x_delta;
 
@@ -186,6 +188,11 @@ void Sim::GetInputAndProcessCovariance(Eigen::Vector2f& u, Eigen::Matrix2f& Q, f
 
   u << v,w;
 }
+//---------------------------------------------------------------------------
+
+Eigen::Vector2f Sim::GetLandmarkPosition() {
+  return landmarks_[id_];
+}
 
 //---------------------------------------------------------------------------
 
@@ -217,6 +224,7 @@ void Sim::Simulate()
 
       pf_.Update();
 //      LogMeasurement();
+//      LogData();
 
     }
 

@@ -1,13 +1,13 @@
 clear all
 close all
 
-log_chi= fopen("/tmp/AS_particle/chi.log","r");
-log_t= fopen("/tmp/AS_particle/t.log","r");
-log_x= fopen("/tmp/AS_particle/x.log","r");
-log_xh= fopen("/tmp/AS_particle/xh.log","r");
-log_u= fopen("/tmp/AS_particle/u.log","r");
-% log_P= fopen("/tmp/AS_particle/P.log","r");
-log_m= fopen("/tmp/AS_particle/m.log","r");
+log_chi= fopen("/home/mark/tmp/AS_particle/chi.log","r");
+log_t= fopen("/home/mark/tmp/AS_particle/t.log","r");
+log_x= fopen("/home/mark/tmp/AS_particle/x.log","r");
+log_xh= fopen("/home/mark/tmp/AS_particle/xh.log","r");
+log_u= fopen("/home/mark/tmp/AS_particle/u.log","r");
+% log_P= fopen("/home/mark/tmp/AS_particle/P.log","r");
+log_m= fopen("/home/mark/tmp/AS_particle/m.log","r");
 
 
 
@@ -26,7 +26,7 @@ m_pos = reshape(fread(log_m,2*num_meas,'float'),2,num_meas,[]);
 
 [xx,yy,zz] = size(chi_array);
 P_array = zeros(3,3,zz);
-for ii = 1:length(zz)
+for ii = 1:zz
     for jj = 1:yy
     P_array(:,:,ii) = P_array(:,:,ii) +chi_array(4,jj,ii).*(chi_array(1:3,jj,ii)-xh_array(:,ii)).*(chi_array(1:3,jj,ii)-xh_array(:,ii))';
 
