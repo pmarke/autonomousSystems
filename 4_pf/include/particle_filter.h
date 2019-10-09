@@ -73,8 +73,8 @@ private:
     float ExpConst_;
     float t_=0;
 
-    float alpha_slow_=0.01;
-    float alpha_fast = 0.1;
+    float alpha_slow_=0.005;
+    float alpha_fast_ = 0.1;
     float w_slow_ = 0;
     float w_fast_ = 0;
     float w_t_ = 0;

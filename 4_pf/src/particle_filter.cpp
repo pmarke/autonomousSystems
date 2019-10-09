@@ -64,16 +64,16 @@ void ParticleFilter::InitializeEstimate() {
 void ParticleFilter::Predict(float Ts) {
 
     t_+=Ts;
-//    std::cout << t_ << std::endl;
+   // std::cout << t_ << std::endl;
 
     // Propogate True dynamics if flag is set to true
     if (propogateTrue_)
         x_ = f_(x_,u_,Ts,true);
 
-//    if (std::fabs(t_-10.0)<Ts/2) {
-//      x_ << 10,10,0,0;
-//
-//    }
+   // if (std::fabs(t_-10.0)<Ts/2) {
+   //   x_ << 10,10,0,0;
+
+   // }
 
 //    std::cerr << "x_: " << std::endl << x_ << std::endl;
 
@@ -113,7 +113,7 @@ void ParticleFilter::Update() {
 //    std::cerr << "w_t: " << w_t_ << std::endl;
 
     w_slow_ += alpha_slow_*(w_t_/static_cast<float>(M_)-w_slow_);
-    w_fast_ += alpha_fast*(w_t_/static_cast<float>(M_)-w_fast_);
+    w_fast_ += alpha_fast_*(w_t_/static_cast<float>(M_)-w_fast_);
 
 //    for (unsigned int i=0; i < M_; i++)
 //    {
@@ -161,6 +161,8 @@ void ParticleFilter::Resample() {
         }
         if (uniform_zero_one_(gen_) < std::max<float>(0.0,1-w_fast_/w_slow_)) {
           chib_[j]=GetParticleFromMeas(z_);
+          chib_[j](3)*=powf((1-w_fast_/w_slow_),2);
+          // std::cerr << "ratio: " << w_fast_/w_slow_ << std::endl;
           w_t += chib_[j](3);
         }
         else {
