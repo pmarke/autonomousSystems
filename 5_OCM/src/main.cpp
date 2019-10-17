@@ -10,7 +10,12 @@
 // #include <Eigen/LU>
 // #include <Eigen/Dense>
 // #include <math.h>       /* isnan, sqrt */
-#include "environment.h"
+// #include "environment.h"
+#include <stdio.h>
+#include <string.h>
+#include <fstream>
+#include <iostream>
+#include <vector>
 
 
 
@@ -20,9 +25,53 @@ int main(int argn, char** argv)
 
 
   // MATFile *pmat;
-  const char *myFile = "/home/mark/projects/autonomousSystems/5_OCM/matlab/state_meas_data.mat";
+  // const char *myFile = "/home/mark/projects/autonomousSystems/5_OCM/matlab/state_meas_data.mat";
 
-  ENV env(myFile);
+  // ENV env(myFile);
+
+  // std::vector<double> meas;
+  // std::ifstream measFile("/home/mark/projects/autonomousSystems/5_OCM/matlab/meas.bin",std::ifstream::in);
+  // double current;
+  // char data[sizeof(current)];
+  // while (measFile.good()) {
+  //   std::cout << "here" << std::endl;
+  //   measFile.read(data, sizeof(current));
+  //   meas.push_back(static_cast<double>(*data));
+  // }
+
+  // std::cout << meas.size() << std::endl;
+
+  // std::cout << meas[0] << std::endl;
+  // std::cout << meas[1] << std::endl;
+  // std::cout << meas[2] << std::endl;
+  // std::cout << meas[6837] << std::endl;
+  // std::cout << meas[6838] << std::endl;
+  // std::cout << meas[6839] << std::endl;
+
+  std::vector<double> thk;
+  std::ifstream thkFile("/home/mark/projects/autonomousSystems/5_OCM/matlab/thk.bin",std::ifstream::in | std::ifstream::binary);
+  // std::cout << thkFile.tellg() << std::endl;
+  double current;
+  char data[sizeof(current)];
+  while (!thkFile.eof()) {
+    // std::cout << "here" << std::endl;
+    thkFile.read(data, sizeof(double));
+    memcpy(&current, data,sizeof(double));
+    
+    if(thkFile.eof()) break;
+    thk.push_back(current);
+    std::cout << current << std::endl;
+  }
+  // while(thkFile >> current)
+  // {
+  //   thk.push
+  // }
+
+  std::cout << thk.size() << std::endl;
+
+  std::cout << thk[0] << std::endl;
+  std::cout << thk[1] << std::endl;
+  std::cout << thk[2] << std::endl;
 
   // pmat = matOpen(myFile,"r");
   // if (pmat == nullptr)

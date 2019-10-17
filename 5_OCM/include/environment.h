@@ -1,24 +1,28 @@
+
+// #include <opencv2/core.hpp>
+#include <opencv2/opencv.hpp>
+// #include <opencv2/imgcodecs.hpp>
+// #include <opencv2/highgui.hpp>
+
 #include <stdio.h>
 #include <string.h> /* For memcpy() */
 #include <stdlib.h> /* For EXIT_FAILURE, EXIT_SUCCESS */
 #include <iostream>
-#include "mat.h"
-#include "matrix.h"
-#include <Eigen/Core>
-#include <Eigen/LU>
-#include <Eigen/Dense>
-#include <math.h> 
-#include <opencv2/core.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui.hpp>
+// #include "mat.h"
+// #include "matrix.h"
+// #include <Eigen/Core>
+// #include <Eigen/LU>
+// #include <Eigen/Dense>
+// #include <math.h> 
+
 
 
 struct MATLAB_DATA {
 
 size_t num_elements;   // Total number of elements
 size_t num_dims;       // Total number of matrix dimension
-double* data;          // Contains the data
-size_t* size;    // Size of each dimension (row, col, etc) 
+std::vector<double> data;          // Contains the data
+std::vector<int> size;    // Size of each dimension (row, col, etc) 
 
 double GetDataPoint(unsigned row, unsigned col, unsigned width)
 {
@@ -60,12 +64,12 @@ class ENV {
 
 public:
 
-ENV(const char* matlab_file_name);
+ENV();
 ~ENV();
 
 private:
 
-void InitMatlabData(const char* matlab_file_name);
+void InitMatlabData();
 void InitMap();
 void CreateMatlabStruct(MATFile* pmat, const char* var_name, MATLAB_DATA& mat_struct);
 
