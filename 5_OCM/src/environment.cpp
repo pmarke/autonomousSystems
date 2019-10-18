@@ -6,7 +6,7 @@ ENV::ENV() {
 
   InitMatlabData();
   InitMap();
-  DisplayEstImg();
+  // DisplayEstImg();
 
 }
 
@@ -139,7 +139,7 @@ void ENV::InitMap() {
 
   cv::namedWindow( true_image_, cv::WINDOW_AUTOSIZE );
   // cv::resizeWindow(true_image_, 500, 500);
-  cv::namedWindow(est_image_, cv::WINDOW_AUTOSIZE);
+  cv::namedWindow(est_image_, cv::WINDOW_NORMAL);
   cv::Mat ti_big;
   cv::resize(map_true_,ti_big,cv::Size(500,500));
   cv::imshow( true_image_, ti_big );
@@ -167,17 +167,24 @@ void ENV::DisplayEstImg() {
 void ENV::SimMap() {
 
 
-// Loop through all of the time steps
-for (int ii=0; ii < z_data_.size[2]; ii++) {
-  // Loop through all of the measurements at each time step
-  for (int jj=0; jj < z_data_.size[1]; jj++) {
-    // If measurement isn't nan, processs measurement
-    if (!std::isnan(z_data_.data))
-      UpdateMap(ii, jj);
+  // std::cerr << "z data size 2: " << z_data_.size[2] << std::endl;
+  // std::cerr << "z data size 1: " << z_data_.size[1] << std::endl;
 
-
+  // Loop through all of the time steps
+  for (int time_step=0; time_step < z_data_.size[2]; time_step++) {
+    // Loop through all of the measurements at each time step
+    for (int meas_num=0; meas_num < z_data_.size[1]; meas_num++) {
+      // If measurement isn't nan, processs measurement
+      if (!std::isnan(z_data_.GetDataPoint(0,meas_num,time_step)))
+      {
+        UpdateMap(time_step, meas_num);
+        // DisplayEstImg();
+      }
+    }
   }
-}
+
+DisplayEstImg();
+
 }
 
 //-----------------------------------------------------------------------------
@@ -188,6 +195,10 @@ void ENV::UpdateMap(int time_step, int meas_number) {
   // Loop through all map data
   for (int ii=0; ii < map_est_.size[0]; ii++) {
     for (int jj=0; jj < map_est_.size[1]; jj++) {
+      float map_probability = map_est_.at<float>(ii,jj);
+      int mapx = jj+1;
+      int mapy = 99-ii+1;
+      map_est_.at<float>(ii,jj) = InverseSensorModel(time_step,meas_number,mapx,mapy,map_probability);
       
     }
   }
@@ -196,4 +207,75 @@ void ENV::UpdateMap(int time_step, int meas_number) {
 
 //-----------------------------------------------------------------------------
 
-float ENV::InverseSensorModel(int time_step, int meas_number, int mapx, int mapy); 
+float ENV::InverseSensorModel(int time_step, int meas_number, int mapx, int mapy, float map_probability) {
+
+  // Robot's x,y pos and heading
+  float rx = X_data_.GetDataPoint(0,time_step);
+  float ry = X_data_.GetDataPoint(1,time_step);
+  float rth = X_data_.GetDataPoint(2,time_step);
+
+  // Measurement range and angle
+  float zr = z_data_.GetDataPoint(0,meas_number,time_step);
+  float zth = z_data_.GetDataPoint(1,meas_number,time_step);
+
+  // Compute the range and heading to the grid cell
+  float r = sqrt(pow(mapx-rx,2)+pow(mapy-ry,2));
+  float th = atan2(mapy-ry,mapx-rx)-rth;
+
+  // wrap theta
+  if (th > kPi)
+    th = th-2*kPi;
+  else if (th <= -kPi)
+    th = th+2*kPi;
+
+
+
+
+  float update = 0;
+
+  // See if map location is within this cone shape
+  if (r > std::min(z_max_, zr+alpha_/2) || std::fabs(th-zth)>beta_/2)
+    update = 0;
+
+  // See if map is on the edge of the cone
+  else if (zr < z_max_  && fabs(r-zr) < alpha_/2)
+    update = locc_;
+  else
+    update = lfree_;
+
+  // convert from log to probability
+  if (update == 0)
+    update = map_probability;
+  else {
+    float ldl = log(map_probability/(1.0f-map_probability));
+    update += ldl;
+    update = 1.0f-1.0f/(1.0f+exp(update));
+  }
+
+
+// && update !=map_probability
+    if (false  && meas_number ==8 & mapx ==0) {
+    std::cerr << std::endl;
+    std::cerr << "rx: " << rx << std::endl;
+    std::cerr << "ry: " << ry << std::endl;
+    std::cerr << "rth: " << rth << std::endl;
+    std::cerr << "zr: " << zr << std::endl;
+    std::cerr << "zth: " << zth << std::endl;
+    std::cerr << "r: " << r << std::endl;
+    std::cerr << "th: " << th << std::endl;
+    std::cerr << "mapx: " << mapx << std::endl;
+    std::cerr << "mapy: " << mapy << std::endl;
+  }
+
+  // if (r > std::min(z_max_, zr+alpha_/2) || std::fabs(th-zth)>beta_/2)
+  //   update = 0;
+  // else if (zr < z_max_ && fabs(th-zth) < alpha_/2)
+  //   update = 0.9;
+  // else
+  //   update = 0;
+
+
+  return update;
+
+
+}

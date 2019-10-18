@@ -16,7 +16,7 @@
 // #include <Eigen/Dense>
 // #include <math.h> 
 
-
+const float kPi=3.14159;
 
 struct MATLAB_DATA {
 
@@ -29,7 +29,7 @@ double GetDataPoint(unsigned row, unsigned col, unsigned width)
 {
   if (num_dims != 3)
   {
-    std::cerr << "The data is not three dimensional";
+    // std::cerr << "The data is not three dimensional";
     return GetDataPoint(row,col);
   }
   else
@@ -42,7 +42,7 @@ double GetDataPoint(unsigned row, unsigned col, unsigned width)
 double GetDataPoint(unsigned row, unsigned col) {
   if (num_dims != 2)
   {
-    std::cerr << "The data is not two dimensional";
+    // std::cerr << "The data is not two dimensional";
     return NAN;
   }
   else
@@ -71,7 +71,7 @@ void InitMatlabData();
 void InitMap();
 void DisplayEstImg();
 void UpdateMap(int time_step, int meas_number);
-float InverseSensorModel(int time_step, int meas_number, int mapx, int mapy); 
+float InverseSensorModel(int time_step, int meas_number, int mapx, int mapy, float map_probability); 
 
 MATLAB_DATA map_data_;
 MATLAB_DATA X_data_;
@@ -85,6 +85,13 @@ std::string true_image_ = "Display true";
 std::string est_image_ = "Display est";
 
 Color color_;
+
+// Inverse model parameters
+float alpha_ = 1;
+float beta_ = 2.0/180.0*kPi;
+float z_max_ = 150.0;
+float locc_ = -0.5;     // log occupied 
+float lfree_ = 0.5;    // log unoccupied
 
 
 

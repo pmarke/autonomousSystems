@@ -19,6 +19,7 @@ int main(int argn, char** argv)
 {
 
   ENV env;
+  env.SimMap();
 
  
 
