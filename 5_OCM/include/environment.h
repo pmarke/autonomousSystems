@@ -8,6 +8,7 @@
 #include <string.h> /* For memcpy() */
 #include <stdlib.h> /* For EXIT_FAILURE, EXIT_SUCCESS */
 #include <iostream>
+#include <color.h>
 // #include "mat.h"
 // #include "matrix.h"
 // #include <Eigen/Core>
@@ -47,14 +48,9 @@ double GetDataPoint(unsigned row, unsigned col) {
   else
   {
     int index = row + col*size[0];
+    // std::cout <<"index: " << index <<std::endl;
     return data[index];
   }
-}
-
-~MATLAB_DATA()
-{
-  delete [] data;
-  delete [] size;
 }
 
 };
@@ -67,11 +63,15 @@ public:
 ENV();
 ~ENV();
 
+void SimMap();
+
 private:
 
 void InitMatlabData();
 void InitMap();
-void CreateMatlabStruct(MATFile* pmat, const char* var_name, MATLAB_DATA& mat_struct);
+void DisplayEstImg();
+void UpdateMap(int time_step, int meas_number);
+float InverseSensorModel(int time_step, int meas_number, int mapx, int mapy); 
 
 MATLAB_DATA map_data_;
 MATLAB_DATA X_data_;
@@ -80,6 +80,11 @@ MATLAB_DATA thk_data_;
 
 cv::Mat map_true_;
 cv::Mat map_est_;
+
+std::string true_image_ = "Display true";
+std::string est_image_ = "Display est";
+
+Color color_;
 
 
 

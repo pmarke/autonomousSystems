@@ -27,10 +27,13 @@ ${OpenCV_INCLUDE_DIRS}
 # message(${Matlab_ROOT_DIR})
 
 
-# ## Declare a C++ library
-# add_library(env_lib
-#   src/environment.cpp
-# )
+## Declare a C++ library
+add_library(env_lib
+  src/environment.cpp
+  src/color.cpp
+)
+
+
 
 
 # add_library(sim_lib
@@ -54,8 +57,8 @@ ${OpenCV_INCLUDE_DIRS}
 # endif(UNIX)
 # # target_link_libraries(main sim_lib)
 
-# target_link_libraries(env_lib ${OpenCV_LIBS})
+target_link_libraries(env_lib ${OpenCV_LIBS})
 
 add_executable(${PROJECT_NAME} src/main.cpp)
-# target_link_libraries(${PROJECT_NAME} env_lib)
-# add_dependencies(${PROJECT_NAME} env_lib)
+target_link_libraries(${PROJECT_NAME} env_lib)
+add_dependencies(${PROJECT_NAME} env_lib)
