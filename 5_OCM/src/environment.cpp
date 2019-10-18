@@ -40,7 +40,7 @@ void ENV::InitMatlabData() {
   thk_data_.num_elements=thk_data_.data.size();
   thk_data_.num_dims = 2;
   thk_data_.size.push_back(1);
-  thk_data_.size.push_back(9);
+  thk_data_.size.push_back(11);
 
   // std::cerr << "starting to write state data" << std::endl;
 
@@ -54,7 +54,7 @@ void ENV::InitMatlabData() {
   X_data_.num_elements=X_data_.data.size();
   X_data_.num_dims = 2;
   X_data_.size.push_back(3);
-  X_data_.size.push_back(380);
+  X_data_.size.push_back(759);
 
 
   // std::cerr << "starting to write meas data" << std::endl;
@@ -69,10 +69,10 @@ void ENV::InitMatlabData() {
   z_data_.num_elements=z_data_.data.size();
   z_data_.num_dims = 3;
   z_data_.size.push_back(2);
-  z_data_.size.push_back(9);
-  z_data_.size.push_back(380);
+  z_data_.size.push_back(11);
+  z_data_.size.push_back(759);
 
-  // std::cerr << "starting to write map data" << std::endl;
+  std::cerr << "starting to write map data" << std::endl;
 
 
   while (!mapFile.eof()) {
@@ -89,7 +89,7 @@ void ENV::InitMatlabData() {
   // std::cout << map_data_.data.size() << std::endl;
   // std::cout << map_data_.GetDataPoint(99,99) << std::endl;
 
-  // std::cerr << "finished writing data" << std::endl;
+  std::cerr << "finished writing data" << std::endl;
 
 
 
@@ -106,7 +106,9 @@ void ENV::InitMatlabData() {
 
 void ENV::InitMap() {
 
-  // std::cout << "size: " << map_data_.size[0] << std::endl;
+  std::cout << "size: " << map_data_.size[0] << std::endl;
+  std::cout << "size: " << map_data_.size[1] << std::endl;
+  std::cout << "size d: " << map_data_.data.size() << std::endl;
 
   map_true_ = cv::Mat(map_data_.size[0],map_data_.size[1],CV_8UC3,cv::Scalar(0,0,0));
   // map_true_ = cv::Mat(100,100,CV_8UC3,cv::Scalar(255,255,255));
@@ -128,6 +130,7 @@ void ENV::InitMap() {
     }
   }
 
+  std::cout << "size: " << X_data_.size[1] << std::endl;
 
   for (int ii=0; ii < X_data_.size[1]; ii++) {
     int x = static_cast<int>(X_data_.GetDataPoint(0,ii));
