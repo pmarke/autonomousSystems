@@ -1,0 +1,362 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass IEEEtran
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 2
+\use_package amssymb 2
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1in
+\topmargin 1in
+\rightmargin 1in
+\bottommargin 1in
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Midterm
+\end_layout
+
+\begin_layout Author
+Mark Petersen
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+A multirotor is flying with constant altitude and receiving bearing and
+ range measurements to several landmarks in order to localize itself.
+ The location of the landmarks are known, but the pose of the multirotor
+ isn't.
+ For the midterm I will use and Extended Information Filter (EIF) in order
+ to localize the multirotor.
+\end_layout
+
+\begin_layout Section
+System and Observation Model
+\end_layout
+
+\begin_layout Standard
+The multirotor is modeled using a simple discrete unicycle model of the
+ form
+\begin_inset Formula 
+\begin{align}
+X_{k} & =f\left(X_{k-1},u_{k}\right)+g\left(X_{k-1},\varepsilon_{k}\right)\\
+z_{k} & =h\left(X_{k},\ell_{i}\right)+w_{k}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The subscript 
+\begin_inset Formula $k$
+\end_inset
+
+ denote the time index.
+ The state vector 
+\begin_inset Formula $X\in\mathbb{R}^{3}$
+\end_inset
+
+ contains the mutilator’s 
+\begin_inset Formula $x$
+\end_inset
+
+ position, 
+\begin_inset Formula $y$
+\end_inset
+
+ position, and heading 
+\begin_inset Formula $\theta$
+\end_inset
+
+ such that 
+\begin_inset Formula $X_{k}=\left[x_{k},y_{k},\theta_{k}\right]^{\top}$
+\end_inset
+
+.
+ The input vector 
+\begin_inset Formula $u\in\mathbb{R}^{2}$
+\end_inset
+
+ contains the velocity, 
+\begin_inset Formula $v$
+\end_inset
+
+, and angular rate, 
+\begin_inset Formula $\omega$
+\end_inset
+
+, such that 
+\begin_inset Formula $u_{k}=\left[v_{k},\omega_{k}\right]^{\top}$
+\end_inset
+
+.
+ The noise vector 
+\begin_inset Formula $\varepsilon\in\mathbb{R}^{2}$
+\end_inset
+
+ contains noise on velocity, 
+\begin_inset Formula $\varepsilon_{v}$
+\end_inset
+
+ and noise on angular rate, 
+\begin_inset Formula $\varepsilon_{\omega},$
+\end_inset
+
+ such 
+\begin_inset Formula $\varepsilon_{k}=\left[\varepsilon_{v,k},\varepsilon_{\omega,k}\right]$
+\end_inset
+
+.
+ The system function 
+\begin_inset Formula $f\left(X_{k-1},u_{k}\right)$
+\end_inset
+
+ maps the previous state, 
+\begin_inset Formula $X_{k-1}$
+\end_inset
+
+, and current input, 
+\begin_inset Formula $u_{k}$
+\end_inset
+
+, to the current state 
+\begin_inset Formula $X_{k}$
+\end_inset
+
+ provided that there is no noise.
+ The system function is described as 
+\begin_inset Formula 
+\begin{equation}
+f\left(X_{k-1},u_{k}\right)=\begin{bmatrix}x_{k-1}+\left(v_{k}\cos\theta_{k-1}\right)\delta\\
+y_{k-1}+\left(v_{k}\sin\theta_{k-1}\right)\delta\\
+\theta_{k-1}+\omega_{k}\delta
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\delta$
+\end_inset
+
+ is the time interval between 
+\begin_inset Formula $k-1$
+\end_inset
+
+ and 
+\begin_inset Formula $k$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+The noise function 
+\begin_inset Formula $g\left(X_{k-1},\varepsilon_{k}\right)$
+\end_inset
+
+ maps the previous state and current noise 
+\begin_inset Formula $\varepsilon_{k}$
+\end_inset
+
+ to process noise.
+ It is described as 
+\begin_inset Formula 
+\begin{equation}
+g\left(X_{k-1},\varepsilon_{k}\right)=\begin{bmatrix}\varepsilon_{v}\cos\left(\theta_{k-1}\right)\delta\\
+\varepsilon_{v}\sin\left(\theta_{k-1}\right)\delta\\
+\varepsilon_{\omega}\delta
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The observation function 
+\begin_inset Formula $h\left(X_{k},\ell_{i}\right)$
+\end_inset
+
+ maps the current states, and the 
+\begin_inset Formula $i^{th}$
+\end_inset
+
+ landmark location 
+\begin_inset Formula $\ell_{i}$
+\end_inset
+
+ to the relative range 
+\begin_inset Formula $r_{i,k}$
+\end_inset
+
+ and bearing, 
+\begin_inset Formula $\phi_{i,k}$
+\end_inset
+
+.
+ The observation is 
+\begin_inset Formula 
+\begin{equation}
+h\left(X_{k},\ell_{i}\right)=\begin{bmatrix}\sqrt{q}\\
+\arctan\left(m_{i,y}-x_{k},m_{i,x}-y_{k}\right)-\theta_{k}
+\end{bmatrix}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $m_{i,y}$
+\end_inset
+
+ and 
+\begin_inset Formula $m_{i,x}$
+\end_inset
+
+ are the 
+\begin_inset Formula $x$
+\end_inset
+
+ and 
+\begin_inset Formula $y$
+\end_inset
+
+ position of landmark 
+\begin_inset Formula $\ell_{i}$
+\end_inset
+
+ and 
+\begin_inset Formula 
+\begin{equation}
+q=\left(m_{i,x}-k_{k}\right)^{2}+\left(m_{i,y}-y_{k}\right)^{2}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The measurement noise 
+\begin_inset Formula $w\sim\mathcal{N}\left(0,W\right)$
+\end_inset
+
+ and the process noise 
+\begin_inset Formula $\varepsilon\sim\mathcal{N}\left(0,\epsilon\right)$
+\end_inset
+
+ where 
+\begin_inset Formula 
+\begin{align}
+W & =\begin{bmatrix}\sigma_{r}^{2} & 0\\
+0 & \sigma_{\phi}^{2}
+\end{bmatrix}\\
+\epsilon & =\begin{bmatrix}\sigma_{v}^{2} & 0\\
+0 & \sigma_{\omega}^{2}
+\end{bmatrix}
+\end{align}
+
+\end_inset
+
+with the values of the standard deviations being 
+\begin_inset Formula 
+\begin{align}
+\sigma_{r} & =0.2\\
+\sigma_{\phi} & =0.1\\
+\sigma_{v} & =0.15\\
+\sigma_{\omega} & =0.1
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Linearization
+\end_layout
+
+\begin_layout Standard
+In order use and EIF, we need to linearize the system function, noise function
+ and observation function.
+\begin_inset Formula 
+\begin{align*}
+F_{k} & =\frac{\partial f\left(X_{k-1},u_{k}\right)}{\partial X_{x-1}}\\
+ & =
+\end{align*}
+
+\end_inset
+
+ 
+\end_layout
+
+\end_body
+\end_document

@@ -90,8 +90,8 @@ Color color_;
 float alpha_ = 1;
 float beta_ = 2.0/180.0*kPi;
 float z_max_ = 150.0;
-float locc_ = -0.5;     // log occupied 
-float lfree_ = 0.5;    // log unoccupied
+float locc_ = -0.3;     // log occupied 
+float lfree_ = 0.3;    // log unoccupied
 
 
 
