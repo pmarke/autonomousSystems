@@ -51,7 +51,8 @@ ey = mean(norm(error_y));
 eth = mean(norm(error_th));
 
 % Plot values of the information vector versus time
-figure(1),clf;
+f1 = figure(1);
+clf;
 plot(t,eif.zeta_history(1,:));
 hold on
 plot(t,eif.zeta_history(2,:));
@@ -60,7 +61,8 @@ title("Information vector vs time");
 legend('x component','y component','z component')
 
 % Plot true and estimated
-figure(2),clf;
+f2 = figure(2);
+clf;
 subplot(3,1,1)
 plot(t,eif.mu_history(1,:),'b');
 hold on
@@ -85,7 +87,8 @@ legend("Estimate","True");
 
 
 % Plot the error
-figure(3),clf;
+f3 = figure(3);
+clf;
 subplot(3,1,1)
 plot(t,error_x,'r');
 hold on
@@ -110,11 +113,34 @@ plot(t,-2*P_std(3,:),'b');
 legend('error (rads)','2*std');
 title('th error')
 
-%% EIF Code
-%
-%<include>EIF.m</include>
-%
-%% Animation Code
-%
-%<include>RobotAnimation.m</include>
-%
+flag_save_plots = true;
+font_size = 10;
+
+filepath = '/home/mark/projects/autonomousSystems/midterm/notes/images';
+
+
+
+ 
+
+% Save the files
+if (flag_save_plots)
+    set(f1,'Units','Inches');
+    pos = get(f1,'Position');
+    set(f1,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+    print(f1,[filepath,'/InformationVector'],'-dpdf','-r0')
+
+    set(f2,'Units','Inches');
+    pos = get(f2,'Position');
+    set(f2,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+    print(f2,[filepath,'/EstVSTrue'],'-dpdf','-r0')
+
+    set(f3,'Units','Inches');
+    pos = get(f3,'Position');
+    set(f3,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+    print(f3,[filepath,'/error'],'-dpdf','-r0')
+
+    set(ra.fig,'Units','Inches');
+    pos = get(ra.fig,'Position');
+    set(ra.fig,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
+    print(ra.fig,[filepath,'/map'],'-dpdf','-r0')
+end

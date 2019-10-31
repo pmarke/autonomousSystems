@@ -8,7 +8,7 @@ classdef EIF < handle
         P = zeros(3,3);     % Error covariance
         Omega = zeros(3,3); % Inverse error covariance
         
-        mu_history = [];
+        mu_history = [];  
         zeta_history = [];
         P_history = [];
         
@@ -16,14 +16,17 @@ classdef EIF < handle
     
     methods
         function obj = EIF(mu0,P)
+            % Initialize EIF parameters
             obj.mu = mu0;
             obj.P = P;
             obj.Omega = inv(obj.P);
             obj.zeta = obj.Omega*obj.mu;
             
+            % Measurement noise covariance
             obj.W = [0.2^2, 0;...
                       0,    0.1^2];
-                  
+            
+            % Process noise covariance
             obj.ep = [0.15^2, 0;...
                         0,     0.1^2];
                     
@@ -44,7 +47,7 @@ classdef EIF < handle
             obj.Omega = inv(Fk/obj.Omega*Fk'+Gk*obj.ep*Gk');
             obj.zeta = obj.Omega*obj.f(Ts,u);          
             
-            % Update mu
+            % Update mu and error covariance
             obj.mu = obj.Omega\obj.zeta;
             obj.P = inv(obj.Omega);
             
@@ -63,6 +66,8 @@ classdef EIF < handle
             % Update inverse error covariance and estimated transformed state
             obj.Omega = obj.Omega + Hk'*inv(obj.W)*Hk;
             er = z-obj.h(ell);
+            
+            % Wrap the error
             if (er(2) > pi)
                 er(2) = er(2)-2*pi;
             elseif(er(2) < -pi)
@@ -74,11 +79,7 @@ classdef EIF < handle
             % Update error covariance and estimated state
             obj.P = inv(obj.Omega);
             obj.mu = obj.Omega\obj.zeta;
-            
-            % wrapping
-
-%             obj.zeta = obj.Omega*obj.mu;
-            
+                        
         end
 
         
@@ -92,6 +93,7 @@ classdef EIF < handle
             v = u(1);          % velocity
             w = u(2);          % angular rate
             
+            % Construct the updated state
             X=[x + v*cos(th)*Ts;...
                y + v*sin(th)*Ts;...
                th + w*Ts];
@@ -107,16 +109,19 @@ classdef EIF < handle
             y = obj.mu(2);     % y position of UAV
             th = obj.mu(3);    % heading of UAV
             
+            % Wrap theta
             if (th > pi)
                 th = th-2*pi;
             elseif(th < -pi)
                 th = th+2*pi;
             end
                 
-            
+            % Construct the estimated observation
             q = (mx-x)^2 + (my-y)^2;
             z = [sqrt(q);...
                 atan2(my-y,mx-x)-th];
+            
+            % Wrap the heading measurement
             if (z(2) > pi)
                 z(2) = z(2)-2*pi;
             elseif(z(2) < -pi)
@@ -142,6 +147,7 @@ classdef EIF < handle
             % Returns the jacobian of the process noise function
             % Ts: time step
             th = obj.mu(3);    % heading of UAV
+            
             G_out = [cos(th)*Ts, 0;...
                      sin(th)*Ts, 0;...
                          0,      Ts];

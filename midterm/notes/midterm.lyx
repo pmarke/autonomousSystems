@@ -2,7 +2,10 @@
 \lyxformat 474
 \begin_document
 \begin_header
-\textclass IEEEtran
+\textclass article
+\begin_preamble
+\usepackage{matlab-prettifier}
+\end_preamble
 \use_default_options true
 \maintain_unincluded_children false
 \language english
@@ -474,11 +477,188 @@ The subscript
 \end_layout
 
 \begin_layout Section
-Implementation
+EIF Code
 \end_layout
 
 \begin_layout Standard
-The code and results will follow
+The EIF was operated using object oriented programming in MATLAB.
+ The class is included in this section.
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
+filename "/home/mark/projects/autonomousSystems/midterm/matlab/EIF.m"
+lstparams "language=Matlab"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Results
+\end_layout
+
+\begin_layout Standard
+In this section we present the results of the simulation.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/InformationVector.pdf
+	width 95col%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+A plot of the components of the information vector as a function of time.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/EstVSTrue.pdf
+	width 95col%
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Plots of the estimated state and true states versus time.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/error.pdf
+	width 95col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+A plots showing the error bounded by the 95 percentile of the error covariancs.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/map.pdf
+	width 95col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+The image shows the landmark locations and the trajectory of the multirotor
+ true and estimated pose.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The figures in this section show that the estimated state converged to the
+ true state using the EIF described in the note.
 \end_layout
 
 \end_body
