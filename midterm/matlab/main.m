@@ -1,10 +1,16 @@
+%% Code Implementation of the EIF
+% This portion of the midterm includes the basic EIF Implementation
+% The results, the code for the EIF, and the code for the animation
+
+
+%% Basic EIF Implementation
 clear all;
 close all;
 load('midterm_data.mat')
 
 P0 = eye(3);     % initial covariance
-% X0 = X_tr(:,1);  % Initial estimate state
-X0 = zeros(3,1);
+X0 = X_tr(:,1);  % Initial estimate state
+% X0 = zeros(3,1);
 Ts = 0.1;        % Time step
 eif = EIF(X0,P0);
 ra = RobotAnimation(m,X_tr);
@@ -30,7 +36,7 @@ end
 
 ra.drawEstimateTrack(eif.mu_history);
 
-%% Draw plots
+%% Results
 
 % Variance and standard deviation of the error covariance diagonal entries
 P_var = reshape([eif.P_history(1,1,:);eif.P_history(2,2,:);eif.P_history(3,3,:)],3,[]);
@@ -103,3 +109,12 @@ plot(t,2*P_std(3,:),'b');
 plot(t,-2*P_std(3,:),'b');
 legend('error (rads)','2*std');
 title('th error')
+
+%% EIF Code
+%
+%<include>EIF.m</include>
+%
+%% Animation Code
+%
+%<include>RobotAnimation.m</include>
+%

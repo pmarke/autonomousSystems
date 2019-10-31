@@ -375,7 +375,7 @@ G_{k} & =\frac{g\left(X_{k-1},\varepsilon_{k}\right)}{\partial\varepsilon}\\
 \begin{align}
 H_{k} & =\frac{\partial h\left(X_{k},\ell_{i}\right)}{\partial X_{k}}\\
  & =\begin{bmatrix}-\frac{\left(m_{i,x}-x_{k}\right)}{\sqrt{q}} & -\frac{\left(m_{i,y}-y_{k}\right)}{\sqrt{q}} & 0\\
-\frac{m_{i,y}-y_{k}}{q} & \frac{m_{i,x}-x_{k}}{q} & -1
+\frac{m_{i,y}-y_{k}}{q} & -\frac{\left(m_{i,x}-x_{k}\right)}{q} & -1
 \end{bmatrix}
 \end{align}
 
@@ -471,6 +471,14 @@ The subscript
  It should be noted that if you have more than one measurement at a given
  time step, then you will run the update phase for every measurement.
  
+\end_layout
+
+\begin_layout Section
+Implementation
+\end_layout
+
+\begin_layout Standard
+The code and results will follow
 \end_layout
 
 \end_body
