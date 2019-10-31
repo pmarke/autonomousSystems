@@ -267,7 +267,7 @@ The observation function
 \begin_inset Formula 
 \begin{equation}
 h\left(X_{k},\ell_{i}\right)=\begin{bmatrix}\sqrt{q}\\
-\arctan\left(m_{i,y}-x_{k},m_{i,x}-y_{k}\right)-\theta_{k}
+\arctan\left(m_{i,y}-y_{k},m_{i,x}-x_{k}\right)-\theta_{k}
 \end{bmatrix}
 \end{equation}
 
@@ -296,7 +296,7 @@ where
  and 
 \begin_inset Formula 
 \begin{equation}
-q=\left(m_{i,x}-k_{k}\right)^{2}+\left(m_{i,y}-y_{k}\right)^{2}
+q=\left(m_{i,x}-x_{k}\right)^{2}+\left(m_{i,y}-y_{k}\right)^{2}
 \end{equation}
 
 \end_inset
@@ -345,16 +345,131 @@ Linearization
 \end_layout
 
 \begin_layout Standard
-In order use and EIF, we need to linearize the system function, noise function
- and observation function.
+In order to use an EIF, we need to linearize the system function, noise
+ function and observation function.
+\begin_inset Formula 
+\begin{align}
+F_{k} & =\frac{\partial f\left(X_{k-1},u_{k}\right)}{\partial X_{x-1}}\\
+ & =\begin{bmatrix}1 & 0 & -v_{k}\sin\left(\theta_{k-1}\right)\delta\\
+0 & 1 & v_{k}\cos\left(\theta_{k-1}\right)\delta\\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+G_{k} & =\frac{g\left(X_{k-1},\varepsilon_{k}\right)}{\partial\varepsilon}\\
+ & =\begin{bmatrix}\cos\left(\theta_{k-1}\right)\delta & 0\\
+\sin\left(\theta_{k-1}\right)\delta & 0\\
+0 & \delta
+\end{bmatrix}
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+H_{k} & =\frac{\partial h\left(X_{k},\ell_{i}\right)}{\partial X_{k}}\\
+ & =\begin{bmatrix}-\frac{\left(m_{i,x}-x_{k}\right)}{\sqrt{q}} & -\frac{\left(m_{i,y}-y_{k}\right)}{\sqrt{q}} & 0\\
+\frac{m_{i,y}-y_{k}}{q} & \frac{m_{i,x}-x_{k}}{q} & -1
+\end{bmatrix}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+EIF
+\end_layout
+
+\begin_layout Standard
+The EIF is similar to an EKF with slight modifications.
+ We begin by introducing the new variable 
+\begin_inset Formula 
+\[
+\zeta_{k}=P_{k}^{-1}\mu_{k}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $u_{k}$
+\end_inset
+
+ is the estimate of 
+\begin_inset Formula $X_{k}$
+\end_inset
+
+, 
+\begin_inset Formula $P_{k}$
+\end_inset
+
+ is the error covariance, and 
+\begin_inset Formula $\zeta_{k}$
+\end_inset
+
+ is the transformed 
+\begin_inset Formula $\mu_{k}$
+\end_inset
+
+.
+ Using the new variable, we can break up the the EIF into the predict phase
+ and the update phase.
+ The predict phase is 
+\begin_inset Formula 
+\begin{align}
+\mu_{k-1|j} & =P_{k-1|j}\zeta_{k-1|j}\\
+P_{k|j}^{-1} & =\left(F_{k}P_{k-1|j}F_{k}^{\top}+G_{k}\epsilon G_{k}^{\top}\right)^{-1}\\
+\zeta_{k|j} & =P_{k|j}^{-1}f\left(\mu_{k-1|j},u_{k}\right)
+\end{align}
+
+\end_inset
+
+and the update phase is 
 \begin_inset Formula 
 \begin{align*}
-F_{k} & =\frac{\partial f\left(X_{k-1},u_{k}\right)}{\partial X_{x-1}}\\
- & =
+\mu_{k|j} & =f\left(\mu_{k-1|j},u_{k}\right)=P_{k|j}\zeta_{k|j}\\
+P_{k|j=k}^{-1} & =P_{k|j}^{-1}+H_{k}^{\top}W_{k}^{-1}H_{k}\\
+\zeta_{k|j=k} & =\zeta_{k|j}+H_{k}^{\top}W_{k}^{-1}\left(z_{k}-h\left(\mu_{k|j},\ell_{i}\right)+H_{k}\mu_{k|j}\right)
 \end{align*}
 
 \end_inset
 
+The subscript 
+\begin_inset Formula $k|j$
+\end_inset
+
+ indicate a variable at time step 
+\begin_inset Formula $k$
+\end_inset
+
+ given measurements up to time step 
+\begin_inset Formula $j$
+\end_inset
+
+ where 
+\begin_inset Formula $j\leq k$
+\end_inset
+
+.
+ Also, the vector 
+\begin_inset Formula $z_{k}=\left[r_{k},\phi_{k}\right]^{\top}$
+\end_inset
+
+.
+ For implementation, it can be easier to let 
+\begin_inset Formula $\Omega=P^{-1}$
+\end_inset
+
+.
+ It should be noted that if you have more than one measurement at a given
+ time step, then you will run the update phase for every measurement.
  
 \end_layout
 
