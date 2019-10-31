@@ -29,8 +29,9 @@ classdef RobotAnimation < handle
             obj.fig = figure(10);
             clf;
             obj.ax = obj.fig.CurrentAxes;
-            set(obj.ax,'XLim',[-30,30]);
-            set(obj.ax,'YLim',[-30,30]);
+            axis manual
+            xlim([-15 15])
+            ylim([-15 15])
             
             % Initialize map
             obj.InitMap();
@@ -68,8 +69,8 @@ classdef RobotAnimation < handle
             radius = 0.5;
             
             if isempty(obj.robot_mean_handle)
-                h1 = rectangle('Position',[mean(1)-radius mean(2)-radius 2*radius 2*radius],'Curvature',[1,1],'FaceColor','b');
-                h2 = line([mean(1),mean(1)+2*radius*cos(mean(3))],[mean(2),mean(2)+2*radius*sin(mean(3))],'Color','k');
+                h1 = rectangle('Position',[mean(1)-radius mean(2)-radius 2*radius 2*radius],'Curvature',[1,1],'FaceColor','b','HandleVisibility','off');
+                h2 = line([mean(1),mean(1)+2*radius*cos(mean(3))],[mean(2),mean(2)+2*radius*sin(mean(3))],'Color','k','HandleVisibility','off');
                 obj.robot_mean_handle = [h1,h2];
                 
             else
@@ -78,8 +79,8 @@ classdef RobotAnimation < handle
             end
             
             if isempty(obj.robot_truth_handle_2)
-                h1 = rectangle('Position',[x(1)-radius x(2)-radius 2*radius 2*radius],'Curvature',[1,1],'FaceColor','g');
-                h2 = line([x(1),x(1)+2*radius*cos(x(3))],[x(2),x(2)+2*radius*sin(x(3))],'Color','k');
+                h1 = rectangle('Position',[x(1)-radius x(2)-radius 2*radius 2*radius],'Curvature',[1,1],'FaceColor','g','HandleVisibility','off');
+                h2 = line([x(1),x(1)+2*radius*cos(x(3))],[x(2),x(2)+2*radius*sin(x(3))],'Color','k','HandleVisibility','off');
                 obj.robot_truth_handle_2 = [h1,h2];
                 
             else
@@ -87,7 +88,7 @@ classdef RobotAnimation < handle
                     set(obj.robot_truth_handle_2(2),'XData',[x(1),x(1)+2*radius*cos(x(3))],'YData',[x(2),x(2)+2*radius*sin(x(3))]);
             end
             
-            obj.drawMeasurements(x,r,bearing)
+%             obj.drawMeasurements(mean,r,bearing)
             
         end
         
@@ -111,14 +112,22 @@ classdef RobotAnimation < handle
             
             if(isempty(obj.measurement_true_handle))
                    
-                obj.measurement_true_handle =plot(landmarks_seen(:,1),landmarks_seen(:,2),'pm','LineWidth',3);
-                obj.measurement_est_handle = plot(pts_meas(:,1),pts_meas(:,2),'pc','LineWidth',3);
+                obj.measurement_true_handle =plot(landmarks_seen(:,1),landmarks_seen(:,2),'pm','LineWidth',3,'HandleVisibility','off');
+                obj.measurement_est_handle = plot(pts_meas(:,1),pts_meas(:,2),'pc','LineWidth',3,'HandleVisibility','off');
             else
                 set(obj.measurement_true_handle,'XData',landmarks_seen(:,1),'YData',landmarks_seen(:,2));
                 set(obj.measurement_est_handle,'XData',pts_meas(:,1),'YData',pts_meas(:,2));
             end
             
                  
+        end
+        
+        function drawEstimateTrack(obj,x_est_history)
+            
+           obj.robot_truth_handle = plot(x_est_history(1,:),x_est_history(2,:),'b-');
+           xlim([-15 15])
+           ylim([-15 15])
+           legend('landmarks','true pose', 'est pose');
         end
  
     end

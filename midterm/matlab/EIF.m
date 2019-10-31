@@ -9,6 +9,7 @@ classdef EIF < handle
         Omega = zeros(3,3); % Inverse error covariance
         
         mu_history = [];
+        zeta_history = [];
         P_history = [];
         
     end
@@ -41,11 +42,11 @@ classdef EIF < handle
             
             % Predict inverse error covariance and estimated transformed state
             obj.Omega = inv(Fk/obj.Omega*Fk'+Gk*obj.ep*Gk');
-%             Omega = obj.Omega
             obj.zeta = obj.Omega*obj.f(Ts,u);          
             
             % Update mu
             obj.mu = obj.Omega\obj.zeta;
+            obj.P = inv(obj.Omega);
             
         end
         
@@ -61,50 +62,26 @@ classdef EIF < handle
             
             % Update inverse error covariance and estimated transformed state
             obj.Omega = obj.Omega + Hk'*inv(obj.W)*Hk;
-            obj.zeta  = obj.zeta + Hk'*inv(obj.W)*(z-obj.h(ell)+Hk*obj.mu);
+            er = z-obj.h(ell);
+            if (er(2) > pi)
+                er(2) = er(2)-2*pi;
+            elseif(er(2) < -pi)
+                er(2) = er(2)+2*pi;
+            end
+            
+            obj.zeta  = obj.zeta + Hk'*inv(obj.W)*(er+Hk*obj.mu);
             
             % Update error covariance and estimated state
             obj.P = inv(obj.Omega);
             obj.mu = obj.Omega\obj.zeta;
+            
+            % wrapping
+
+%             obj.zeta = obj.Omega*obj.mu;
+            
         end
+
         
-%         function Predict(obj,Ts,u)
-%             % Predict step for EIF.
-%             % Ts is the time step
-%             % u: is the input vector u=[v,w]'
-%             
-%             % Compute jacobians
-%             Fk = obj.F(Ts,u);
-%             Gk = obj.G(Ts);
-%             
-%             % Predict inverse error covariance and estimated transformed state
-%             obj.P = Fk*obj.P*Fk' + Gk*obj.ep*Gk'; 
-%         
-%             
-%             % Update mu
-%             obj.mu = obj.f(Ts,u);
-%             
-%         end
-        
-%         function Update(obj,r,phi,ell)
-%             % The update phase of the EIF.
-%             % r: is the measured range to the target
-%             % phi: is the relative angle to the target
-%             % ell: the location of the target. ell = [mx,my]
-%             z = [r;phi];
-%             
-%             % Compute jacobian
-%             Hk = obj.H(ell);
-%                         
-%             % Update inverse error covariance and estimated transformed state
-%             S = Hk*obj.P*Hk'+obj.W;
-%             K = obj.P*Hk'*inv(S);
-%             er = z-obj.h(ell);
-%             
-%             obj.mu = obj.mu+K*(er);
-%             obj.P = (eye(3)-K*Hk)*obj.P;
-%             
-%         end
         function X=f(obj,Ts,u)
             % The system function
             % Ts: time step
@@ -168,6 +145,7 @@ classdef EIF < handle
             G_out = [cos(th)*Ts, 0;...
                      sin(th)*Ts, 0;...
                          0,      Ts];
+
         end
         
         function H_out = H(obj,ell)
@@ -186,7 +164,8 @@ classdef EIF < handle
         
         function UpdateHistory(obj)
             obj.mu_history = [obj.mu_history,obj.mu];
-            obj.P_history =  [obj.P_history,obj.P];
+            obj.P_history =  cat(3,obj.P_history,obj.P);
+            obj.zeta_history = [obj.zeta_history,obj.zeta];
         end
     end
 end
