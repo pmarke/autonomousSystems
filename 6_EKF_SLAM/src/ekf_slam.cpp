@@ -1,7 +1,7 @@
 #include "ekfslam/ekf_slam.h"
 
 
-EKF_SLAM::EKF_SLAM(int num_landmarks, float vel, float radius)
+EKF_SLAM::EKF_SLAM(int num_landmarks, float fov, float vel, float radius)
 {
 
 
@@ -19,13 +19,15 @@ log_t_.open("/home/mark/projects/autonomousSystems/6_EKF_SLAM/log/t.log",std::of
 log_x_.open("/home/mark/projects/autonomousSystems/6_EKF_SLAM/log/x.log",std::ofstream::out);
 log_xh_.open("/home/mark/projects/autonomousSystems/6_EKF_SLAM/log/xh.log",std::ofstream::out); 
 log_u_.open("/home/mark/projects/autonomousSystems/6_EKF_SLAM/log/u.log",std::ofstream::out); 
-log_P_.open("/home/mark/projects/autonomousSystems/6_EKF_SLAM/log/P.log",std::ofstream::out); 
+log_P_.open("/home/mark/projects/autonomousSystems/6_EKF_SLAM/log/P.log",std::ofstream::out);
+log_P_full_.open("/home/mark/projects/autonomousSystems/6_EKF_SLAM/log/P_full.log",std::ofstream::out);
 log_m_.open("/home/mark/projects/autonomousSystems/6_EKF_SLAM/log/m.log",std::ofstream::out);
 log_landmarks_.open("/home/mark/projects/autonomousSystems/6_EKF_SLAM/log/landmarks.log",std::ofstream::out);
 log_landmarks_.write( (char*) &num_landmarks,   sizeof(int));
 
 
 vel_ = vel;
+fov_ = fov;
 radius_ = radius;
 angular_vel_ = vel_/radius_;
 if (num_landmarks < 1)
@@ -61,6 +63,7 @@ EKF_SLAM::~EKF_SLAM()
   log_xh_.close();  
   log_u_.close();  
   log_P_.close(); 
+  log_P_full_.close();
   log_m_.close();
   log_landmarks_.close();
   std::cout << "Finished writing log data!" << std::endl;
@@ -300,10 +303,10 @@ Eigen::Vector2f EKF_SLAM::getMeasurement(const Eigen::VectorXf& x,int landmark_i
   // std::cout << "zb: " << z(1) << std::endl;
 
 
-  // while (z(1) > kPI)
-  //   z(1) = z(1)-2*kPI;
-  // while(z(1)<-kPI)
-  //   z(1) = z(1) + 2*kPI;
+  while (z(1) > kPI)
+    z(1) = z(1)-2*kPI;
+  while(z(1)<-kPI)
+    z(1) = z(1) + 2*kPI;
 
   // std::cout << "z: " << z(1) << std::endl;
 
@@ -421,7 +424,7 @@ void EKF_SLAM::Update(const Eigen::VectorXf& z, int landmark_id) {
   while(err(1)<-kPI)
     err(1) = err(1) + 2*kPI;
 
-  std::cerr << " err: " << std::endl << err << std::endl;
+  // std::cerr << " err: " << std::endl << err << std::endl;
 
 
 
@@ -457,6 +460,12 @@ void EKF_SLAM::LogErrorCovariance() {
   log_P_.write( (char*) Pd.data(),   (3+2*num_landmarks_)*sizeof(float)); 
 }
 
+void EKF_SLAM::LogFullErrorCovariance() {
+
+  // std::cerr << "P full " << std::endl << (3+2*num_landmarks_)*(3+2*num_landmarks_) << std::endl;
+  
+  log_P_full_.write( (char*) P_.data(),   (3+2*num_landmarks_)*(3+2*num_landmarks_)*sizeof(float)); 
+}
 //---------------------------------------------------------------------------
 
 void EKF_SLAM::LogMeasurement(const Eigen::Vector2f& z)
@@ -480,6 +489,9 @@ void EKF_SLAM::LogData()
 
 //---------------------------------------------------------------------------
 
+
+//---------------------------------------------------------------------------
+
 void EKF_SLAM::Sim() {
 
 // std::cerr << "start sim" << std::endl;
@@ -492,6 +504,8 @@ LogData();
 
 Eigen::Vector2f u_true(vel_,angular_vel_);
 Eigen::Matrix2f process_cov = getM(u_true);
+process_cov(0,0) = sqrt(process_cov(0,0));
+process_cov(1,1) = sqrt(process_cov(1,1));
 Eigen::Vector2f z;                           // Measurement
 
 
@@ -501,7 +515,7 @@ while (t_ < tf_) {
   // std::cerr << "t: " << t_ << std::endl;
   t_+=Ts_;
   PropogateTrue(u_true,Ts_);
-  u_ = u_true + process_cov*Eigen::Vector2f(randn_(gen_),randn_(gen_));
+  u_ = u_true + process_cov*Eigen::Vector2f(randn_(gen_),randn_(gen_))*0;
 
   // std::cerr << "prop true" << std::endl;
 
@@ -527,8 +541,9 @@ while (t_ < tf_) {
 
   }
   
-
+  
   LogData();
 }
+LogFullErrorCovariance();
 
 }

@@ -14,6 +14,7 @@ classdef RobotAnimation < handle
         ax
         landmark_handle;
         landmark_est_handle;
+        ellipse_handle;
         robot_mean_handle;
         robot_truth_handle;
         robot_truth_handle_2;
@@ -57,7 +58,7 @@ classdef RobotAnimation < handle
           
         end
         
-        function Update(obj,mean,x,r,th)
+        function Update(obj,mean,x,std_p,r,th)
             % point where n is the number of particles
             % mean: The estimated state
             % x:    The true state
@@ -83,6 +84,23 @@ classdef RobotAnimation < handle
                     set(obj.robot_mean_handle(2),'XData',[mean(1),mean(1)+2*radius*cos(mean(3))],'YData',[mean(2),mean(2)+2*radius*sin(mean(3))]);
                     set(obj.landmark_est_handle,'XData',est_landmarks(1,:),'YData',est_landmarks(2,:));
             end
+            
+            % Draw landmark covariances
+            landmark_size = size(obj.landmarks);
+            if isempty(obj.ellipse_handle)
+                for ii = 1:landmark_size(1)
+                    [X,Y] = obj.getEllipsePoints(std_p(2+2*ii),std_p(3+2*ii),mean(2+2*ii),mean(3+2*ii));
+                    h = line(X,Y,'Color','b','HandleVisibility','off');
+                    obj.ellipse_handle = [obj.ellipse_handle,h];
+                end
+                
+            else
+                for ii = 1:landmark_size(1)
+                    [X,Y] = obj.getEllipsePoints(std_p(1+2*ii),std_p(2+2*ii),mean(2+2*ii),mean(3+2*ii));
+                    set(obj.ellipse_handle(ii),'XData',X,'YData',Y);
+                end
+                    
+            end 
             
             if isempty(obj.robot_truth_handle_2)
                 h1 = rectangle('Position',[x(1)-radius x(2)-radius 2*radius 2*radius],'Curvature',[1,1],'FaceColor','g','HandleVisibility','off');
@@ -134,6 +152,12 @@ classdef RobotAnimation < handle
            xlim([-25 25])
            ylim([-25 25])
            legend('landmarks','true pose', 'est pose');
+        end
+        
+        function [X,Y] = getEllipsePoints(obj,std_x,std_y,mx,my)
+            t = linspace(0,2*pi,10);
+            X = 2*std_x*cos(t)+mx;
+            Y = 2*std_y*sin(t)+my;
         end
  
     end

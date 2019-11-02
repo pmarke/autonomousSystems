@@ -19,7 +19,7 @@ class EKF_SLAM
 
 public: 
 
-EKF_SLAM(int num_landmarks, float vel, float radius);
+EKF_SLAM(int num_landmarks, float fov, float vel, float radius);
 ~EKF_SLAM();
 
 void Sim();
@@ -91,10 +91,12 @@ void LogEstState();
 void LogErrorCovariance();
 void LogMeasurement(const Eigen::Vector2f& z);
 void LogData();
+void LogFullErrorCovariance();
 
 // Environment Parameters
 float vel_;
 float radius_;
+float fov_;
 float angular_vel_;
 int num_landmarks_;
 
@@ -118,8 +120,6 @@ float alpha4_ = 0.1;
 float sigma_r_= 0.1;
 float sigma_phi_ = 0.05;
 
-float fov_ = 2*kPI;          // Field of view for the sensor
-
 // Time variables
 float t_;         // Current time
 float Ts_;        // Time step
@@ -141,6 +141,7 @@ std::ofstream log_x_;
 std::ofstream log_xh_;  
 std::ofstream log_u_;  
 std::ofstream log_P_; 
+std::ofstream log_P_full_; 
 std::ofstream log_m_;   // Measurement log 
 std::ofstream log_landmarks_;;
 

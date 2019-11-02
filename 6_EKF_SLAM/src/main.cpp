@@ -7,6 +7,7 @@ int main(int argc, char **argv)
 
 int num_landmarks = 3;
 float radius = 10;
+float fov = 2*3.14159;
 float vel = 1;
 if (argc > 1)
 {
@@ -22,15 +23,25 @@ if (argc > 2)
 {
   std::stringstream convert(argv[2]);
   
-  if (!(convert >> vel))
+  if (!(convert >> fov))
   {
-    vel=1;
+    fov=2*3.14159;
     std::cout << "Did not convert:" << std::endl;
   }
 }
 if (argc > 3)
 {
   std::stringstream convert(argv[3]);
+  
+  if (!(convert >> vel))
+  {
+    vel=1;
+    std::cout << "Did not convert:" << std::endl;
+  }
+}
+if (argc > 4)
+{
+  std::stringstream convert(argv[4]);
   
   if (!(convert >> radius))
   {
@@ -40,7 +51,7 @@ if (argc > 3)
 }
 
 std::cout << "num landmarks: " << num_landmarks << std::endl;
-EKF_SLAM ekfs(num_landmarks,vel,radius);
+EKF_SLAM ekfs(num_landmarks,fov,vel,radius);
 
 ekfs.Sim();
 
