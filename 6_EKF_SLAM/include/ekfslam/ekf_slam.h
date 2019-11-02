@@ -34,7 +34,7 @@ Eigen::Vector2f getLandmark(const Eigen::VectorXf& x, int landmark_id);
 
 // Sets the location of the x an y position of the landmark in 
 // vector x specified by landmark_id
-void setLandmark(const Eigen::VectorXf& x, int landmark_id, const Eigen::Vector2f& m);
+void setLandmark(Eigen::VectorXf& x, int landmark_id, const Eigen::Vector2f& m);
 
 // The system function. 
 // x: the state vector
@@ -70,7 +70,7 @@ void Predict(const Eigen::VectorXf& u, float Ts);
 
 // Compute the measurement
 // landmark_id: the landmarks id
-Eigen::VectorXf getMeasurement(const Eigen::VectorXf& x, int landmark_id, bool flag_true);
+Eigen::Vector2f getMeasurement(const Eigen::VectorXf& x, int landmark_id, bool flag_true);
 
 // Compute the small H
 // landmark_id: the landmarks id
@@ -101,14 +101,14 @@ int num_landmarks_;
 
 
 Eigen::VectorXf x_;          // True states
-Eigen::VectoxXf xh_;         // Estimated states
+Eigen::VectorXf xh_;         // Estimated states
 Eigen::MatrixXf P_;          // Estimate Covariance
-Eigen::MatrixXf Q_;          // Measurement Covariance
+Eigen::Matrix2f Q_;          // Measurement Covariance
 Eigen::MatrixXf S_;          // Innovation term
 Eigen::MatrixXf K_;          // Kalman Gain
 
 
-Eigen::VectorXf u_;          // Input into the system
+Eigen::Vector2f u_;          // Input into the system
 // Covariance coefficients
 float alpha1_ = 0.1;
 float alpha2_ = 0.01;
@@ -142,6 +142,6 @@ std::ofstream log_xh_;
 std::ofstream log_u_;  
 std::ofstream log_P_; 
 std::ofstream log_m_;   // Measurement log 
-std::ofstream std::ofstream log_landmarks_;;
+std::ofstream log_landmarks_;;
 
 };
