@@ -19,12 +19,14 @@ class EKF_SLAM
 
 public: 
 
-EKF_SLAM(int num_landmarks);
+EKF_SLAM(int num_landmarks, float vel, float radius);
 ~EKF_SLAM();
 
-void sim();
+void Sim();
 
 private:
+
+void InitEnvironment();
 
 // Returns the location of the x an y position of the landmark in 
 // vector x specified by landmark_id
@@ -84,9 +86,17 @@ void NewLandmark(const Eigen::VectorXf& z, int landmark_id);
 // landmark_id: the landmarks id
 void Update(const Eigen::VectorXf& z, int landmark_id);
 
+void LogTrueState();
+void LogEstState();
+void LogErrorCovariance();
+void LogMeasurement(const Eigen::Vector2f& z);
+void LogData();
 
-
-
+// Environment Parameters
+float vel_;
+float radius_;
+float angular_vel_;
+int num_landmarks_;
 
 
 
@@ -122,15 +132,16 @@ std::vector<bool> landmark_seen_;         // Indicates if it has been seen befor
 std::default_random_engine gen_;
 std::normal_distribution<double> randn_{0,1};
 
-int num_landmarks_;
+
 
 // Log Data
-std::ofstream log_K_;                 
+// std::ofstream log_K_;                 
 std::ofstream log_t_;                
 std::ofstream log_x_;  
 std::ofstream log_xh_;  
 std::ofstream log_u_;  
 std::ofstream log_P_; 
 std::ofstream log_m_;   // Measurement log 
+std::ofstream std::ofstream log_landmarks_;;
 
 };

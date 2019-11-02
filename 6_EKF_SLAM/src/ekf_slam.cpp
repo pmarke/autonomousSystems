@@ -1,12 +1,45 @@
 #include "ekf_slam.h"
 
 
-EKF_SLAM::EKF_SLAM(int num_landmarks)
+EKF_SLAM::EKF_SLAM(int num_landmarks, float vel, float radius)
 {
+
+
+// Initilize logging data
+std::cout << "Writting log data to /home/mark/projects/autonomousSystems/6_EKF_SLAM/log" << std::endl;
+  
+// Make sure the filepath exists
+if (!fs::exists("/home/mark/projects/autonomousSystems/6_EKF_SLAM/log"))
+{
+  fs::create_directory("/home/mark/projects/autonomousSystems/6_EKF_SLAM/log");
+}
+
+// log_K_.open("/home/mark/projects/autonomousSystems/6_EKF_SLAM/log/k.log",std::ofstream::out);
+log_t_.open("/home/mark/projects/autonomousSystems/6_EKF_SLAM/log/t.log",std::ofstream::out);
+log_x_.open("/home/mark/projects/autonomousSystems/6_EKF_SLAM/log/x.log",std::ofstream::out);
+log_xh_.open("/home/mark/projects/autonomousSystems/6_EKF_SLAM/log/xh.log",std::ofstream::out); 
+log_u_.open("/home/mark/projects/autonomousSystems/6_EKF_SLAM/log/u.log",std::ofstream::out); 
+log_P_.open("/home/mark/projects/autonomousSystems/6_EKF_SLAM/log/P.log",std::ofstream::out); 
+log_m_.open("/home/mark/projects/autonomousSystems/6_EKF_SLAM/logm.log",std::ofstream::out);
+log_landmarks_.open("/home/mark/projects/autonomousSystems/6_EKF_SLAM/log/landmarks.log",std::ofstream::out)
+log_m_.write( (char*) &num_landmarks_,   sizeof(int));
+log_landmarks_.write( (char*) &num_landmarks_,   sizeof(int));
+
+
+
+
+
 
 
 // Init meas covariance
 Q_ << powf(sigma_r_,2), 0, 0, powf(sigma_phi_,2);
+P_ = Eigen::Matrix<float,3+2*num_landmarks_,3+2*num_landmarks_>::Zero();
+P_.setIdentity();
+P_ = P_*100;
+P_.block<0,0,3,3>=Eigen::Matrix<float,3,3>::Zero();
+
+std::cout << "P matrix: " << std::endl << P_ << std::endl;
+
 
 }
 
@@ -14,15 +47,64 @@ Q_ << powf(sigma_r_,2), 0, 0, powf(sigma_phi_,2);
 
 EKF_SLAM::~EKF_SLAM()
 {
+
+  // log_K_.close();                 
+  log_t_.close();                
+  log_x_.close();  
+  log_xh_.close();  
+  log_u_.close();  
+  log_P_.close(); 
+  log_m_.close();
+  log_landmarks_.close();
+  std::cout << "Finished writing log data!" << std::endl;
+
 }
 
 
 //---------------------------------------------------------------------------
 
 
-void EKF_SLAM::InitLandmarks()
+void EKF_SLAM::InitEnvironment()
 {
   
+t_ = 0.0f;
+Ts_ = 0.1f;
+tf_ = 2.0f*kPI*radius_/vel_;  // approximate time for one orbit
+
+vel_ = vel;
+radius_ = radius;
+angular_vel_ = vel_/radius_;
+if (num_landmarks < 1)
+  num_landmarks = 1;
+num_landmarks_ = num_landmarks;
+
+// Initialize the true and estimated states
+x_ = Eigen::Vector<float,3+2*num_landmarks_>::Zero();
+x_(0) = 0.0f;
+x_(1) = 0.0f;
+x_(2) = kPI/2.0f;
+xh_ = Eigen::Vector<float,3+2*num_landmarks_>::Zero();
+
+// Initilize the landmark vector
+landmark_seen_ = std::std::vector<bool>(num_landmarks_,false);
+
+// Create Landmarks
+Eigen::Vector2f m;
+m << x_(0)+radius_, x_(1)+0.0f;
+setLandmark(x_,1,m);
+log_landmarks_.write( (char*) m.data(),   sizeof(float)*2);
+
+if (num_landmarks_ > 1) {
+  float delta_th = 2.0f*kPI/(num_landmarks_);
+  float curr_th = delta_th;
+  Eigen::Vector2f center(x_(0),x_(1)+radius_);
+  for (unsigned int ii = 2; ii <= num_landmarks_; i++) {
+    m << center(0)-radius_*cos(curr_th), center(1) - radius_*sin(curr_th);
+    curr_th += delta_th;
+    setLandmark(x_,ii,m);
+    log_landmarks_.write( (char*) m.data(),   sizeof(float)*2);
+  }
+}
 
 
 }
@@ -257,7 +339,61 @@ void EKF_SLAM::Update(const Eigen::VectorXf& z, int landmark_id) {
   xh_ += K_*(z-zh);
   P_ = (Eigen::Matrix3f::Identity()-K_*H)*P_;
 
+}
 
+//---------------------------------------------------------------------------
 
+void EKF_SLAM::LogTrueState() {
+  log_x_.write( (char*) x_.data(),  3*sizeof(float));
+}
+
+//---------------------------------------------------------------------------
+
+void EKF_SLAM::LogEstState() {
+  log_xh_.write( (char*) xh_.data(), (3+num_landmarks_*2)*sizeof(float));
+}
+//---------------------------------------------------------------------------
+
+void EKF_SLAM::LogErrorCovariance() {
+  log_P_.write( (char*) P_.diagonal().data(),   9*sizeof(float)); 
+}
+
+//---------------------------------------------------------------------------
+
+void EKF::LogMeasurement(const Eigen::Vector2f& z)
+{
+  log_m_.write( (char*) z.data(),   2*sizeof(float));
+}
+
+//---------------------------------------------------------------------------
+
+void EKF::LogData()
+{
+    // log data
+    // log_K_.write( (char*) K_.data(),   6*sizeof(float));  
+    log_u_.write( (char*) u_.data(),   2*sizeof(float));               
+    log_t_.write( (char*) &t_,          sizeof(float));                 
+    LogTrueState();
+    LogEstState();
+    LogErrorCovariance();
+}
+
+//---------------------------------------------------------------------------
+
+void Sim() {
+
+LogTrueState();
+LogEstState();
+LogErrorCovariance();
+
+Eigen::Vector2f u_true(vel_,angular_vel_);
+
+for (t_ < tf_, t_+=Ts_) {
+
+  PropogateTrue(u_true,Ts_)
+
+  LogData();
+
+}
 
 }
