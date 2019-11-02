@@ -91,11 +91,11 @@ void Update(const Eigen::VectorXf& z, int landmark_id);
 
 
 Eigen::VectorXf x_;          // True states
-Eigen::VectoxXf xh_;  // Estimated states
+Eigen::VectoxXf xh_;         // Estimated states
 Eigen::MatrixXf P_;          // Estimate Covariance
 Eigen::MatrixXf Q_;          // Measurement Covariance
 Eigen::MatrixXf S_;          // Innovation term
-Eigen::MatrixXf K_; // Kalman Gain
+Eigen::MatrixXf K_;          // Kalman Gain
 
 
 Eigen::VectorXf u_;          // Input into the system

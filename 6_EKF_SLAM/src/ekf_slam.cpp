@@ -5,7 +5,8 @@ EKF_SLAM::EKF_SLAM(int num_landmarks)
 {
 
 
-
+// Init meas covariance
+Q_ << powf(sigma_r_,2), 0, 0, powf(sigma_phi_,2);
 
 }
 
@@ -243,8 +244,20 @@ void EKF_SLAM::Update(const Eigen::VectorXf& z, int landmark_id) {
   NewLandmark(z,landmark_id);
 
   // Get estimated vector and construct big H
-  Eigen::Vector2f z_est = getMeasurement(xh_,landmark_id,false);
+  Eigen::Vector2f zh= getMeasurement(xh_,landmark_id,false);
   Eigen::Matrix<float,2,5> h = getSmallH(landmark_id);
-  Eigen::Matrix<float,5,xh_.rows()>
+  Eigen::Matrix<float,2,xh_.rows()> H;
+  H.setZero();
+
+  H.block<0,0,2,3> = h.block<0,0,2,3>;
+  H.block<0,2*landmark_id,2,2> = h.block<0,3,2,2>;
+
+  S_ = H*P_*H.transpose() + Q_;
+  K_ = P_*H.transpose()*S_.inverse();
+  xh_ += K_*(z-zh);
+  P_ = (Eigen::Matrix3f::Identity()-K_*H)*P_;
+
+
+
 
 }
