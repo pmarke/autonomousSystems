@@ -96,7 +96,7 @@ classdef RobotAnimation < handle
                 
             else
                 for ii = 1:landmark_size(1)
-                    [X,Y] = obj.getEllipsePoints(std_p(1+2*ii),std_p(2+2*ii),mean(2+2*ii),mean(3+2*ii));
+                    [X,Y] = obj.getEllipsePoints(std_p(2+2*ii),std_p(3+2*ii),mean(2+2*ii),mean(3+2*ii));
                     set(obj.ellipse_handle(ii),'XData',X,'YData',Y);
                 end
                     

@@ -52,7 +52,7 @@ ra = RobotAnimation(landmarks,x_array);
 for ii = 2:length(t_array)
    ra.Update(xh_array(:,ii),x_array(:,ii),std_p(:,ii),reshape(m_array(1,:,ii),1,[]),reshape(m_array(1,:,ii),1,[]));
 
-%    pause(0.01)
+   pause(0.01)
 end
 ra.drawEstimateTrack(xh_array(1:3,:))
 

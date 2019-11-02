@@ -259,16 +259,20 @@ void EKF_SLAM::Predict(const Eigen::VectorXf& u, float Ts) {
   // std::cerr << "G: " << std::endl << G << std::endl;
   // std::cerr << "F: " << std::endl << F << std::endl;
   // std::cerr << "M: " << std::endl << M << std::endl;
+  // std::cerr << "M: " << std::endl << M << std::endl;
+  // std::cerr << "ba;sd: " << std::endl << G*P_*G.transpose() << std::endl;
+
 
   xh_.head(3) = x;
   // while (xh_(2) > kPI)
   //   xh_(2) = xh_(2)-2*kPI;
+
   // while(xh_(2)<-kPI)
   //   xh_(2) = xh_(2) + 2*kPI;
   // P_.block<3,3>(0,0) = G*P_.block<3,3>(0,0)*G.transpose() + V*M*V.transpose();
   P_ = G*P_*G.transpose() + F.transpose()* V*M*V.transpose()*F;
 
-  // std::cerr << "P_.block<3,3>(0,0): " << std::endl << P_.block<3,3>(0,0) << std::endl;
+  // std::cerr << "P " << std::endl << P_ << std::endl;
 
 
 }
@@ -313,7 +317,7 @@ Eigen::Vector2f EKF_SLAM::getMeasurement(const Eigen::VectorXf& x,int landmark_i
   // See if the measurement is in the field of view if
   // it is associated with the true state
   // if it isn't in the field of view. Set it to Nan
-  if( fabs(z(1))>fov_*100 && flag_true)
+  if( fabs(z(1))>fov_ && flag_true)
     z << std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN();
 
   return z;
@@ -411,6 +415,10 @@ void EKF_SLAM::Update(const Eigen::VectorXf& z, int landmark_id) {
   // std::cerr << "H: " << std::endl << H << std::endl;
   // std::cerr << "zh: " << std::endl << zh << std::endl;
 
+  // if (landmark_id == 4) {
+  //   std::cerr << "H: " << std::endl << H << std::endl;
+  //   // std::cerr << "zh: " << std::endl << zh << std::endl;
+  // }
 
   S_ = H*P_*H.transpose() + Q_;
   // std::cerr << "S: " << std::endl << S_ << std::endl;
@@ -432,6 +440,7 @@ void EKF_SLAM::Update(const Eigen::VectorXf& z, int landmark_id) {
   // std::cerr << "xh_: " << std::endl << xh_ << std::endl;
   P_ = (Eigen::MatrixXf::Identity(3+2*num_landmarks_,3+2*num_landmarks_)-K_*H)*P_;
   // std::cerr << "P_: " << std::endl << P_ << std::endl;
+  // std::cerr << "K_*H: " << std::endl << K_*H << std::endl;
 
   // while (xh_(2) > kPI)
   //   xh_(2) = xh_(2)-2*kPI;
@@ -515,7 +524,7 @@ while (t_ < tf_) {
   // std::cerr << "t: " << t_ << std::endl;
   t_+=Ts_;
   PropogateTrue(u_true,Ts_);
-  u_ = u_true + process_cov*Eigen::Vector2f(randn_(gen_),randn_(gen_))*0;
+  u_ = u_true + process_cov*Eigen::Vector2f(randn_(gen_),randn_(gen_));
 
   // std::cerr << "prop true" << std::endl;
 
@@ -527,7 +536,7 @@ while (t_ < tf_) {
 
   for (unsigned int jj=1; jj <= num_landmarks_; jj++) {
     // std::cerr << "landmark: " << jj << std::endl;
-    z = getMeasurement(x_, jj, true,false);
+    z = getMeasurement(x_, jj, true,true);
 
     // TODO: add noise
 
