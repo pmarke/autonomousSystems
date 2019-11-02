@@ -22,18 +22,14 @@ t_array = reshape(fread(log_t,'float'),1,[]);
 x_array = reshape(fread(log_x,'float'),3,[]);
 xh_array = reshape(fread(log_xh,'float'),3+num_landmarks*2,[]);
 u_array = reshape(fread(log_u,'float'),2,[]);
-P_array = reshape(fread(log_P,'float'),3+num_landmarks*2,[]);
+P_array = reshape(fread(log_P,'float32'),3+num_landmarks*2,[]);
 
 
 
-% m_array = fread(log_m,'float32');
 
-% std_px = reshape(P_array(1,1,:),1,[]);
-% std_px = sqrt(std_px);
-% std_py = reshape(P_array(2,2,:),1,[]);
-% std_py = sqrt(std_py);
-% std_w = reshape(P_array(3,3,:),1,[]);
-% std_w = sqrt(std_w);
+
+std_px = sqrt(P_array);
+
 
 tmp = repmat(reshape(landmarks,1,[])',1,length(t_array));
 e_array = [x_array;tmp] - xh_array;
@@ -48,6 +44,41 @@ fclose(log_P);
 fclose(log_m);
 
 ra = RobotAnimation(landmarks,x_array);
+
+
+%%
+for ii = 2:length(t_array)
+   ra.Update(xh_array(:,ii),x_array(:,ii),reshape(m_array(1,:,ii),1,[]),reshape(m_array(1,:,ii),1,[]));
+
+   pause(0.01)
+end
+ra.drawEstimateTrack(xh_array(1:3,:))
+
+%%
+
+figure(5),clf;
+hold on
+for ii = 1:4
+   plot(t_array,P_array(ii,:)); 
+   min(P_array(ii,:))
+end
+legend('x','y','th','1','2','3','4','5','6')
+
+figure(6),clf;
+subplot(3,1,1)
+plot(t_array,xh_array(1,:));
+hold on;
+plot(t_array,x_array(1,:));
+
+subplot(3,1,2)
+plot(t_array,xh_array(2,:));
+hold on;
+plot(t_array,x_array(2,:));
+
+subplot(3,1,3)
+plot(t_array,xh_array(3,:));
+hold on;
+plot(t_array,x_array(3,:));
 
 %%
 
@@ -124,10 +155,3 @@ for r = 1:row
     
 end
 
-%%
-for ii = 2:length(t_array)
-   ra.Update(xh_array(:,ii),x_array(:,ii),reshape(m_array(1,:,ii+1),2,[]),reshape(m_array(1,:,ii+1),2,[]));
-
-
-end
-ra.drawEstimateTrack(xh_array(1:3,:))

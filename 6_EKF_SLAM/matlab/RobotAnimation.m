@@ -44,7 +44,7 @@ classdef RobotAnimation < handle
         
             % Make sure that the landmarks are nx2. If not, change it
             size_landmarks = size(obj.landmarks);
-            if (size_landmarks(2) > size_landmarks(1))
+            if (size_landmarks(1) == 2)
                 obj.landmarks = obj.landmarks';
             end
             
@@ -75,7 +75,7 @@ classdef RobotAnimation < handle
             if isempty(obj.robot_mean_handle)
                 h1 = rectangle('Position',[mean(1)-radius mean(2)-radius 2*radius 2*radius],'Curvature',[1,1],'FaceColor','b','HandleVisibility','off');
                 h2 = line([mean(1),mean(1)+2*radius*cos(mean(3))],[mean(2),mean(2)+2*radius*sin(mean(3))],'Color','k','HandleVisibility','off');
-                obj.landmark_est_handle = line(est_landmarks(1,:),est_landmarks(2,:),'Color','b','HandleVisibility','off');
+                obj.landmark_est_handle = line(est_landmarks(1,:),est_landmarks(2,:),'Color','b','Marker','*','LineStyle','none','HandleVisibility','off');
                 obj.robot_mean_handle = [h1,h2];
                 
             else

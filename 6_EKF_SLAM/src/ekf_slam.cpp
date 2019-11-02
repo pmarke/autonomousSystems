@@ -76,7 +76,7 @@ void EKF_SLAM::InitEnvironment()
   
 t_ = 0.0f;
 Ts_ = 0.1f;
-tf_ = 2.0f*kPI*radius_/vel_;  // approximate time for one orbit
+tf_ = 2.0f*kPI*radius_/vel_*2.0f;  // approximate time for one orbit
 
 // Initialize the true and estimated states
 x_ = Eigen::MatrixXf::Zero(3+2*num_landmarks_,1);
@@ -85,14 +85,22 @@ x_(1) = 0.0f;
 x_(2) = kPI/2.0f;
 xh_ = Eigen::MatrixXf::Zero(3+2*num_landmarks_,1);
 xh_.head(3) = x_.head(3);
+// xh_.head(3) << 5.0*randn_(gen_), 5.0f*randn_(gen_), kPI*randn_(gen_);
+// if (xh_(2) > kPI)
+//   xh_(2) = xh_(2)-2*kPI;
+// if(xh_(3)<-kPI)
+//   xh_(2) = xh_(2) + 2*kPI;
 
 // Initilize the landmark vector
 landmark_seen_ = std::vector<bool>(num_landmarks_,false);
 
 // Create Landmarks
 Eigen::Vector2f m;
+Eigen::Vector2f z;
+z << std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN();
 m << x_(0), x_(1)+radius_;
 setLandmark(x_,1,m);
+LogMeasurement(z);
 log_landmarks_.write( (char*) m.data(),   sizeof(float)*2);
 
 float w_sign = 1;
@@ -107,9 +115,11 @@ if (num_landmarks_ > 1) {
     m << center(0)-radius_*cos(curr_th)*w_sign, center(1) + radius_*sin(curr_th);
     curr_th += delta_th;
     setLandmark(x_,ii,m);
+    LogMeasurement(z);
     log_landmarks_.write( (char*) m.data(),   sizeof(float)*2);
   }
 }
+
 
 
 }
@@ -170,9 +180,9 @@ Eigen::MatrixXf EKF_SLAM::getG(const Eigen::VectorXf& x, const Eigen::VectorXf& 
 
   Eigen::Matrix3f G;
 
-  G << 1,    0,  -v/w*cos(th)+v/w*cos(th+w*Ts),
-       0,    1,  -v/w*sin(th)+v/w*sin(th+w*Ts),
-       0,    0,               1; 
+  G << 0,    0,  -v/w*cos(th)+v/w*cos(th+w*Ts),
+       0,    0,  -v/w*sin(th)+v/w*sin(th+w*Ts),
+       0,    0,               0; 
 
   return G;
 
@@ -221,6 +231,11 @@ void EKF_SLAM::PropogateTrue(const Eigen::VectorXf& u, float Ts) {
   Eigen::Vector3f x = getg(x_,u,Ts);
   x_.head(3) = x;
 
+  // while (x_(2) > kPI)
+  //   x_(2) = x_(2)-2*kPI;
+  // while(x_(2)<-kPI)
+  //   x_(2) = x_(2) + 2*kPI;
+
 }
 
 //---------------------------------------------------------------------------
@@ -228,16 +243,27 @@ void EKF_SLAM::PropogateTrue(const Eigen::VectorXf& u, float Ts) {
 void EKF_SLAM::Predict(const Eigen::VectorXf& u, float Ts) {
 
   Eigen::Vector3f x = getg(xh_,u,Ts);
-  Eigen::Matrix3f G =getG(xh_,u,Ts);
+  Eigen::Matrix3f g =getG(xh_,u,Ts);
   Eigen::Matrix<float,3,2> V = getV(xh_,u,Ts);
   Eigen::Matrix2f M = getM(u);
+  Eigen::MatrixXf F = Eigen::MatrixXf::Zero(3,3+2*num_landmarks_);
+  Eigen::MatrixXf G = Eigen::MatrixXf::Zero(3+2*num_landmarks_,3+2*num_landmarks_);
+  F.block<3,3>(0,0) = Eigen::Matrix3f::Identity();
+  G = Eigen::MatrixXf::Identity(3+2*num_landmarks_,3+2*num_landmarks_)+F.transpose()*g*F;
+
 
   // std::cerr << "V: " << std::endl << V << std::endl;
   // std::cerr << "G: " << std::endl << G << std::endl;
+  // std::cerr << "F: " << std::endl << F << std::endl;
   // std::cerr << "M: " << std::endl << M << std::endl;
 
   xh_.head(3) = x;
-  P_.block<3,3>(0,0) = G*P_.block<3,3>(0,0)*G.transpose() + V*M*V.transpose();
+  // while (xh_(2) > kPI)
+  //   xh_(2) = xh_(2)-2*kPI;
+  // while(xh_(2)<-kPI)
+  //   xh_(2) = xh_(2) + 2*kPI;
+  // P_.block<3,3>(0,0) = G*P_.block<3,3>(0,0)*G.transpose() + V*M*V.transpose();
+  P_ = G*P_*G.transpose() + F.transpose()* V*M*V.transpose()*F;
 
   // std::cerr << "P_.block<3,3>(0,0): " << std::endl << P_.block<3,3>(0,0) << std::endl;
 
@@ -246,11 +272,15 @@ void EKF_SLAM::Predict(const Eigen::VectorXf& u, float Ts) {
 
 //---------------------------------------------------------------------------
 
-Eigen::Vector2f EKF_SLAM::getMeasurement(const Eigen::VectorXf& x,int landmark_id, bool flag_true) {
+Eigen::Vector2f EKF_SLAM::getMeasurement(const Eigen::VectorXf& x,int landmark_id, bool flag_true, bool flag_noise) {
 
   Eigen::Vector2f z; // Measurement 
   Eigen::Vector2f m; // landmark location 
   m = getLandmark(x,landmark_id);
+
+  // std::cerr << "m: " << std::endl << m << std::endl;
+  // std::cerr << "landmark_id: " << std::endl << landmark_id << std::endl;
+
   
 
   float mx = m(0);  // The x position of the landmark seen
@@ -262,14 +292,25 @@ Eigen::Vector2f EKF_SLAM::getMeasurement(const Eigen::VectorXf& x,int landmark_i
 
   float q = powf(mx-px,2)+powf(my-py,2);    // Range^2 to landmark
 
-  z << sqrt(q) + sigma_r_*randn_(gen_),atan2(my-py,mx-px)+sigma_phi_*randn_(gen_)-th;
+  if (flag_noise)
+    z << sqrt(q) + sigma_r_*randn_(gen_),atan2(my-py,mx-px)+sigma_phi_*randn_(gen_)-th;
+  else
+    z << sqrt(q),atan2(my-py,mx-px)-th;
 
-  // std::cout << "z: " << z << std::endl;
+  // std::cout << "zb: " << z(1) << std::endl;
+
+
+  // while (z(1) > kPI)
+  //   z(1) = z(1)-2*kPI;
+  // while(z(1)<-kPI)
+  //   z(1) = z(1) + 2*kPI;
+
+  // std::cout << "z: " << z(1) << std::endl;
 
   // See if the measurement is in the field of view if
   // it is associated with the true state
   // if it isn't in the field of view. Set it to Nan
-  if( fabs(z(1))>fov_/2.0 && flag_true)
+  if( fabs(z(1))>fov_*100 && flag_true)
     z << std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN();
 
   return z;
@@ -299,7 +340,7 @@ Eigen::Matrix<float,2,5> EKF_SLAM::getSmallH(int landmark_id) {
   Eigen::Matrix<float,2,5> H;
 
   H << -qs*delta_x, -qs*delta_y, 0, qs*delta_x, qs*delta_y,
-       delta_y, -delta_x, -q, -delta_y, delta_x;
+           delta_y, -delta_x,   -q,   -delta_y, delta_x;
   H = H/q;
 
   return H;
@@ -344,7 +385,8 @@ void EKF_SLAM::Update(const Eigen::VectorXf& z, int landmark_id) {
   // std::cerr << "new landmark " << std::endl;
 
   // Get estimated vector and construct big H
-  Eigen::Vector2f zh= getMeasurement(xh_,landmark_id,false);
+  Eigen::Vector2f zh= getMeasurement(xh_,landmark_id,false,false);
+  Eigen::Vector2f err;
   // std::cerr << "got est measurement " << std::endl;
 
   Eigen::Matrix<float,2,5> h = getSmallH(landmark_id);
@@ -357,9 +399,12 @@ void EKF_SLAM::Update(const Eigen::VectorXf& z, int landmark_id) {
   H.block<2,2>(0,1+2*landmark_id) = h.block<2,2>(0,3);
 
   // std::cerr << "constructed big h " << std::endl;
-
+  // std::cerr << "xh: " << std::endl << xh_.head(3) << std::endl;
   // std::cerr << "zh: " << std::endl << zh << std::endl;
+  // std::cerr << "z: " << std::endl << z << std::endl;
   // std::cerr << "h: " << std::endl << h << std::endl;
+  // std::cerr << "landmark_id: " << std::endl << landmark_id << std::endl;
+
   // std::cerr << "H: " << std::endl << H << std::endl;
   // std::cerr << "zh: " << std::endl << zh << std::endl;
 
@@ -369,10 +414,26 @@ void EKF_SLAM::Update(const Eigen::VectorXf& z, int landmark_id) {
 
   K_ = P_*H.transpose()*S_.inverse();
   // std::cerr << "K: " << std::endl << K_ << std::endl;
-  xh_ += K_*(z-zh);
+  err = (z-zh);
+
+  while (err(1) > kPI)
+    err(1) = err(1)-2*kPI;
+  while(err(1)<-kPI)
+    err(1) = err(1) + 2*kPI;
+
+  std::cerr << " err: " << std::endl << err << std::endl;
+
+
+
+  xh_ += K_*err;
   // std::cerr << "xh_: " << std::endl << xh_ << std::endl;
   P_ = (Eigen::MatrixXf::Identity(3+2*num_landmarks_,3+2*num_landmarks_)-K_*H)*P_;
   // std::cerr << "P_: " << std::endl << P_ << std::endl;
+
+  // while (xh_(2) > kPI)
+  //   xh_(2) = xh_(2)-2*kPI;
+  // while(xh_(2)<-kPI)
+  //   xh_(2) = xh_(2) + 2*kPI;
 
 }
 
@@ -391,7 +452,9 @@ void EKF_SLAM::LogEstState() {
 
 void EKF_SLAM::LogErrorCovariance() {
 
-  log_P_.write( (char*) P_.diagonal().data(),   (3+2*num_landmarks_)*sizeof(float)); 
+  // std::cerr << "Pd " << std::endl << P_.diagonal() << std::endl;
+  Eigen::VectorXf Pd= P_.diagonal();
+  log_P_.write( (char*) Pd.data(),   (3+2*num_landmarks_)*sizeof(float)); 
 }
 
 //---------------------------------------------------------------------------
@@ -434,7 +497,7 @@ Eigen::Vector2f z;                           // Measurement
 
 // std::cerr << "start loop" << std::endl;
 
-while (t_ < 0.3) {
+while (t_ < tf_) {
   // std::cerr << "t: " << t_ << std::endl;
   t_+=Ts_;
   PropogateTrue(u_true,Ts_);
@@ -450,12 +513,16 @@ while (t_ < 0.3) {
 
   for (unsigned int jj=1; jj <= num_landmarks_; jj++) {
     // std::cerr << "landmark: " << jj << std::endl;
-    z = getMeasurement(x_, jj, true);
+    z = getMeasurement(x_, jj, true,false);
+
+    // TODO: add noise
 
     LogMeasurement(z);
     // std::cerr << "got meas: " << std::endl << z << std::endl;
     if (!std::isnan(z(0)))
       Update(z,jj);
+    else
+      std::cerr << "meas not seen" << std::endl;
     // std::cerr << "finished updating" << std::endl;
 
   }

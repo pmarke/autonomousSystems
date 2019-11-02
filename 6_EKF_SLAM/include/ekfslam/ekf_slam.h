@@ -70,7 +70,7 @@ void Predict(const Eigen::VectorXf& u, float Ts);
 
 // Compute the measurement
 // landmark_id: the landmarks id
-Eigen::Vector2f getMeasurement(const Eigen::VectorXf& x, int landmark_id, bool flag_true);
+Eigen::Vector2f getMeasurement(const Eigen::VectorXf& x, int landmark_id, bool flag_true, bool flag_noise);
 
 // Compute the small H
 // landmark_id: the landmarks id
