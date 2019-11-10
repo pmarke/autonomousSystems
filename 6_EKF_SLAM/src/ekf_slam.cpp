@@ -26,13 +26,7 @@ log_landmarks_.open("/home/mark/projects/autonomousSystems/6_EKF_SLAM/log/landma
 log_landmarks_.write( (char*) &num_landmarks,   sizeof(int));
 
 
-vel_ = vel;
-fov_ = fov;
-radius_ = radius;
-angular_vel_ = vel_/radius_;
-if (num_landmarks < 1)
-  num_landmarks = 1;
-num_landmarks_ = num_landmarks;
+
 
 
 
