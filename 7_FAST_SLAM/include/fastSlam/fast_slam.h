@@ -15,8 +15,64 @@ namespace fs = std::experimental::filesystem;
 const float kPI = 3.14159;
 
 
-struct State {
+class State {
 
+public:
+
+// State(const Eigen::Vector3f& x, int num_landmarks, int num_particles, unsigned int tmp) {
+
+
+//   landmarks_seen_ = std::vector<bool>(num_landmarks,false);
+//   weight_ = 1.0f/num_particles;
+//   num_landmarks_ = num_landmarks;
+
+//   stacked_states_ = Eigen::VectorXf::Ones(3+2*num_landmarks_)*tmp;
+//   stacked_covariance_ = Eigen::VectorXf::Ones(4*num_landmarks_)*tmp;
+//   // stacked_states_.head(3) = x;
+
+//     // std::cerr << "mem C: " << stacked_covariance_.data() << std::endl;
+
+
+
+//   // new (&x_) Eigen::Map<Eigen::Vector3f>(stacked_states_.data(),3);
+
+
+  
+//   for (unsigned int k = 0; k < num_landmarks_; k++) {
+
+//     landmarks_.emplace_back(stacked_states_.data()+3+2*k,2);
+
+
+//     P_.emplace_back(stacked_covariance_.data()+4*k,2,2);
+//     P_[k] << 100,0, 0, 100;
+
+//     // std::cerr << "mem: " << P_[k].data() << std::endl;
+
+
+//   }
+// }
+
+State(const State& other) {
+  landmarks_seen_ = other.landmarks_seen_;
+  weight_ = other.weight_;
+  num_landmarks_ = other.num_landmarks_;
+  stacked_states_ = other.stacked_states_;
+  stacked_covariance_ = other.stacked_covariance_;
+
+  for (unsigned int k = 0; k < num_landmarks_; k++) {
+
+    landmarks_.emplace_back(stacked_states_.data()+3+2*k,2);
+
+
+    P_.emplace_back(stacked_covariance_.data()+4*k,2,2);
+    // P_[k] << 100,0, 0, 100;
+
+    // std::cerr << "mem: " << P_[k].data() << std::endl;
+
+
+  }
+
+}
 
 State(const Eigen::Vector3f& x, int num_landmarks, int num_particles) {
 
@@ -30,7 +86,7 @@ State(const Eigen::Vector3f& x, int num_landmarks, int num_particles) {
   stacked_states_.head(3) = x;
 
 
-  new (&x_) Eigen::Map<Eigen::Vector3f>(stacked_states_.data(),3);
+  // new (&x_) Eigen::Map<Eigen::Vector3f>(stacked_states_.data(),3);
 
 
   
@@ -59,7 +115,7 @@ void AddWeight(float weight) {
 Eigen::VectorXf stacked_states_;           // The robot's pose stacked with landmark's pos
 Eigen::VectorXf stacked_covariance_;       // The stacked covariance of all of the landmarks
 
-Eigen::Map<Eigen::Vector3f> x_{NULL};                  // The robot's pose, x = [px, py, theta]
+// Eigen::Map<Eigen::Vector3f> x_{NULL};                  // The robot's pose, x = [px, py, theta]
 std::vector<Eigen::Map<Eigen::Vector2f>> landmarks_;   // The landmarks position
 std::vector<bool> landmarks_seen_;                     // Indicates if a specific landmark has been seen
 std::vector<Eigen::Map<Eigen::Matrix2f>> P_;           // The landmarks error covariance

@@ -67,6 +67,7 @@ std::cout << "FOV: " << fov << std::endl;
 std::cout << "num particles: " << num_particles << std::endl;
 // std::cout << "num landmarks: " << num_landmarks << std::endl;
 FastSlam fast_slam(num_landmarks,fov,num_particles,vel,radius);
+fast_slam.Sim();
 
 
 

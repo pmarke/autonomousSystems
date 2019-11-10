@@ -14,8 +14,12 @@ num_landmarks_ = num_landmarks;
 num_particles_ = num_particles;
 
 InitLog();
+std::cerr << "init log: " << std::endl;
 InitEnvrionment();
+std::cerr << "init env: " << std::endl;
+
 InitParticles();
+std::cerr << "init particles: " << std::endl;
 
 
 }
@@ -90,7 +94,7 @@ Eigen::Vector2f m;
 Eigen::Vector2f z;
 z << std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN();
 m << x_(0), x_(1)+radius_;
-setLandmark(x_,1,m);
+setLandmark(x_,0,m);
 LogMeasurement(z);
 log_landmarks_.write( (char*) m.data(),   sizeof(float)*2);
 
@@ -102,7 +106,7 @@ if (num_landmarks_ > 1) {
   float delta_th = 2.0f*kPI/(num_landmarks_);
   float curr_th = delta_th;
   Eigen::Vector2f center(x_(0)+radius_*w_sign,x_(1));
-  for (unsigned int ii = 2; ii <= num_landmarks_; ii++) {
+  for (unsigned int ii = 1; ii < num_landmarks_; ii++) {
     m << center(0)-radius_*cos(curr_th)*w_sign, center(1) + radius_*sin(curr_th);
     curr_th += delta_th;
     setLandmark(x_,ii,m);
@@ -118,27 +122,72 @@ if (num_landmarks_ > 1) {
 void FastSlam::InitParticles() {
 
   Eigen::Vector3f xh(0,0,kPI/2.0f);
-  State s(xh,num_landmarks_,num_particles_);
+  //   std::cerr << "par s1: "<< std::endl;
 
-  std::cerr << "num particles: " << num_particles_<< std::endl;
-  std::cerr << "num landmarks: " << num_landmarks_<< std::endl;
+  //   State s1(xh,num_landmarks_,num_particles_,1);
+  
+  //   std::cerr << "par s2: "<< std::endl;
+
+  // State s2(xh,num_landmarks_,num_particles_,2);
+  //   std::cerr << "par s3: "<< std::endl;
+  // State s3(xh,num_landmarks_,num_particles_,3);
+  //   std::cerr << "par s4: "<< std::endl;
+  // State s4(xh,num_landmarks_,num_particles_,4);
+  //   std::cerr << "par s5: "<< std::endl;
+  // State s5(xh,num_landmarks_,num_particles_,5);
+  //   std::cerr << "par s6: "<< std::endl;
+  // State s6(xh,num_landmarks_,num_particles_,6);
+  //   std::cerr << "par s7: "<< std::endl;
+  // State s7(xh,num_landmarks_,num_particles_,7);
+  //   std::cerr << "par s8: "<< std::endl;
+  // State s8(xh,num_landmarks_,num_particles_,8);
+  //   std::cerr << "par s9: "<< std::endl;
+  // State s9(xh,num_landmarks_,num_particles_,9);
+
+  // std::cerr << "num particles: " << num_particles_<< std::endl;
+  // std::cerr << "num landmarks: " << num_landmarks_<< std::endl;
   
 
 
   for (unsigned int k=0; k < num_particles_; k++) {
     // particles_.push_back(s);
-    particles_.emplace_back(xh,num_landmarks_,num_particles_);
+    State s(xh,num_landmarks_,num_particles_);
+    // std::cerr << "par k: " << k << std::endl;
+
+    particles_.push_back(s);
+      // std::cerr << "states: " << std::endl << particles_[k].stacked_states_ << std::endl;
+  // std::cerr << "P: " << std::endl << particles_[k].stacked_covariance_ << std::endl;
+
   }
 
   Q_ << powf(sigma_r_,2), 0, 0, powf(sigma_phi_,2);
-  std::cerr << "here " << particles_.size() << std::endl;
+  // std::cerr << "here " << particles_.size() << std::endl;
 
-  std::cerr << "states: " << std::endl << particles_[0].stacked_states_ << std::endl;
-  std::cerr << "P: " << std::endl << particles_[0].stacked_covariance_ << std::endl;
+  CalculateParticleMean();
 
-  std::cerr << "states: " << std::endl << particles_[num_particles_-1].stacked_states_ << std::endl;
-  std::cerr << "P: " << std::endl << particles_[num_particles_-1].stacked_covariance_ << std::endl;
+  Eigen::Matrix2f P;
+  Eigen::Vector2f m;
+  P << 1,2,3,4;
+  m << 5,6;
 
+  particles_[0].landmarks_[0] = m;
+  particles_[0].P_[0] = P;
+
+  // std::cerr << "first mem: " << &particles_[0].P_[0] << std::endl;
+
+  std::cerr << std::endl << std::endl << std::endl;
+
+
+  // for (unsigned int k=0; k < num_particles_; k++) {
+  //   // particles_.push_back(s);
+  //   // particles_.emplace_back(xh,num_landmarks_,num_particles_,k);
+  //   // std::cerr << "par k: " << k << std::endl;
+  //   std::cerr << "states: " << std::endl << particles_[k].stacked_states_ << std::endl;
+  //   std::cerr << "P: " << std::endl << particles_[k].stacked_covariance_ << std::endl;
+  //   // std::cerr << "mem states: " << std::endl << &particles_[k].stacked_states_ << std::endl;
+  //   // std::cerr << "mem P: " << std::endl << &particles_[k].stacked_covariance_ << std::endl;
+
+  // }
 }
 
 //---------------------------------------------------------------------------
@@ -386,15 +435,31 @@ bool FastSlam::NewLandmark(const Eigen::VectorXf& z, State& particle, int landma
     float my = py+r*sin(phi+th);
     m << mx, my;
 
+    std::cerr << "new meas: " << m <<  std::endl;
+    std::cerr << "to landmark: " <<  landmark_id << std::endl;
+
+
     particle.landmarks_[landmark_id] = m;
+
+    std::cerr << "added meas" << std::endl;
+
 
     Eigen::Matrix<float,2,2> H;
 
     H = getH(particle.stacked_states_,m);
 
+    // std::cerr << "got H" << std::endl;
+
+
     particle.P_[landmark_id] = H.inverse()*Q_*H.inverse().transpose();
 
+    // std::cerr << "cov updated" << std::endl;
+
+
     particle.AddWeight(default_weight_);
+
+    // std::cerr << "weight added" << std::endl;
+
 
 
     is_new_landmark = true;
@@ -413,11 +478,13 @@ void FastSlam::Update(const Eigen::VectorXf& z, int landmark_id) {
 
 for (unsigned int k = 0; k < num_particles_; k++) {
 
+  // std::cerr << "update k: " << k << std::endl;
+
   // If you have never seen the landmark, initilize it
   // else do the normal update
   if (!NewLandmark(z,particles_[k],landmark_id) ) {
 
-    // std::cerr << "new landmark " << std::endl;
+    // std::cerr << "not new landmark " << std::endl;
 
     // Get estimated vector and construct big H
     Eigen::Vector2f zh= getMeasurement(particles_[k].stacked_states_,particles_[k].landmarks_[landmark_id],false,false);
@@ -476,6 +543,8 @@ void FastSlam::Resample() {
   // CalculateTotalWeight();
   NormalizeWeights();
 
+  // std::cerr << "normalized weights" << std::endl;
+
 
   particles_tmp_.clear();
 
@@ -488,17 +557,38 @@ void FastSlam::Resample() {
   unsigned int i =0;
   float U = 0;
   float w_t = 0;
+  // std::cerr << "starting resample loop" << std::endl;
+  
+  // std::cerr << "c: " << c << std::endl;
+
   for (unsigned int k = 0; k < num_particles_; k++) {
+    // std::cerr << "here" << std::endl;
       U = r + static_cast<float>(k)/num_particles_;
+    // std::cerr << "U: " << U << std::endl;
+
       while (U>c) {
+    // std::cerr << "here3" << std::endl;
+
           i++;
-        particles_[i].weight_;
+        // std::cerr << "i: " << i << std::endl;
+
         c += particles_[i].weight_;
+        // std::cerr << "c: " << c << std::endl;
       }
+        // std::cerr << "i: " << i << std::endl;
+
       particles_[i].weight_flag_ = false;
+        // std::cerr << "flag set: " << i << std::endl;
+
       particles_tmp_.push_back(particles_[i]);
 
+        // std::cerr << "pushed back: " << i << std::endl;
+
+
   }
+
+  // std::cerr << "finished resample loop" << std::endl;
+
 
   particles_ = particles_tmp_;
   NormalizeWeights();
@@ -552,7 +642,7 @@ Eigen::Vector2f landmark;                           // Measurement
 // std::cerr << "start loop" << std::endl;
 
 while (t_ < tf_) {
-  // std::cerr << "t: " << t_ << std::endl;
+  std::cerr << "t: " << t_ << std::endl;
   t_+=Ts_;
   PropogateTrue(u_true,Ts_);
   u_noise = u_true + process_cov*Eigen::Vector2f(randn_(gen_),randn_(gen_));
@@ -580,7 +670,12 @@ while (t_ < tf_) {
       std::cerr << "meas not seen" << std::endl;
     // std::cerr << "finished updating" << std::endl;
 
+    // std::cerr << "finished meas update: " << std::endl << std::endl;
+
+
   }
+    // std::cerr << "finished meas update: " << std::endl << std::endl;
+
 
   Resample();
   
@@ -591,5 +686,8 @@ while (t_ < tf_) {
   LogErrorCovariance();
   LogTime();
 }
+
+std::cout << "x: " << std::endl << x_ << std::endl;
+std::cout << "xh: " << std::endl << xh_ << std::endl;
 
 }
