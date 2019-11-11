@@ -14,12 +14,12 @@ num_landmarks_ = num_landmarks;
 num_particles_ = num_particles;
 
 InitLog();
-std::cerr << "init log: " << std::endl;
+// std::cerr << "init log: " << std::endl;
 InitEnvrionment();
-std::cerr << "init env: " << std::endl;
+// std::cerr << "init env: " << std::endl;
 
 InitParticles();
-std::cerr << "init particles: " << std::endl;
+// std::cerr << "init particles: " << std::endl;
 
 
 }
@@ -165,17 +165,21 @@ void FastSlam::InitParticles() {
 
   CalculateParticleMean();
 
-  Eigen::Matrix2f P;
-  Eigen::Vector2f m;
-  P << 1,2,3,4;
-  m << 5,6;
+  // Eigen::Matrix2f P;
+  // Eigen::Vector2f m;
+  // P << 1,2,3,4;
+  // m << 5,6;
 
-  particles_[0].landmarks_[0] = m;
-  particles_[0].P_[0] = P;
+  // particles_[0].landmarks_[0] = m;
+  // particles_[0].P_[0] = P;
 
   // std::cerr << "first mem: " << &particles_[0].P_[0] << std::endl;
+  // std::cerr << "cov mat: " << particles_[0].P_[0] << std::endl;
 
-  std::cerr << std::endl << std::endl << std::endl;
+  // std::cerr << std::endl << std::endl << std::endl;
+
+  // std::cerr << "particle weight:  " << particles_[999].weight_ << std::endl;
+  // std::cerr << "particle weight:  " << particles_[1000].weight_ << std::endl;
 
 
   // for (unsigned int k=0; k < num_particles_; k++) {
@@ -229,7 +233,7 @@ void FastSlam::LogErrorCovariance() {
 
   for (unsigned int k=0; k < num_particles_; k++) {
     
-    log_particles_.write( (char*) particles_[k].stacked_covariance_.data(),  (4*num_landmarks_)*sizeof(float));
+    log_P_.write( (char*) particles_[k].stacked_covariance_.data(),  (4*num_landmarks_)*sizeof(float));
 
   }  
 }
@@ -249,6 +253,18 @@ void FastSlam::LogTime() {
 }
 
 //---------------------------------------------------------------------------
+
+void FastSlam::LogWeights() {
+
+  for (unsigned int k=0; k < num_particles_; k++) {
+    
+    log_weights_.write( (char*) &particles_[k].weight_,  sizeof(float));
+
+  }  ; 
+}
+
+//---------------------------------------------------------------------------
+
 
 void FastSlam::setLandmark(Eigen::VectorXf& x, int landmark_id, const Eigen::Vector2f& m) {
  
@@ -435,13 +451,13 @@ bool FastSlam::NewLandmark(const Eigen::VectorXf& z, State& particle, int landma
     float my = py+r*sin(phi+th);
     m << mx, my;
 
-    std::cerr << "new meas: " << m <<  std::endl;
-    std::cerr << "to landmark: " <<  landmark_id << std::endl;
+    // std::cerr << "new meas: " << m <<  std::endl;
+    // std::cerr << "to landmark: " <<  landmark_id << std::endl;
 
 
     particle.landmarks_[landmark_id] = m;
 
-    std::cerr << "added meas" << std::endl;
+    // std::cerr << "added meas" << std::endl;
 
 
     Eigen::Matrix<float,2,2> H;
@@ -516,6 +532,9 @@ for (unsigned int k = 0; k < num_particles_; k++) {
     float weight = ImportanceFactor(err,S);
     particles_[k].AddWeight(weight);
 
+    // std::cerr << "finished update " << std::endl;
+
+
   }
 }
 
@@ -566,14 +585,16 @@ void FastSlam::Resample() {
       U = r + static_cast<float>(k)/num_particles_;
     // std::cerr << "U: " << U << std::endl;
 
-      while (U>c) {
+      while (U>c && i < particles_.size()-1) {
     // std::cerr << "here3" << std::endl;
 
           i++;
         // std::cerr << "i: " << i << std::endl;
 
         c += particles_[i].weight_;
+        // std::cerr << "p size: " << particles_.size() << std::endl;
         // std::cerr << "c: " << c << std::endl;
+        // std::cerr << "U: " << U << std::endl;
       }
         // std::cerr << "i: " << i << std::endl;
 
@@ -589,8 +610,10 @@ void FastSlam::Resample() {
 
   // std::cerr << "finished resample loop" << std::endl;
 
-
-  particles_ = particles_tmp_;
+  particles_.swap(particles_tmp_);
+  // particles_tmp_.clear();
+  // std::cerr << "finished swap" << std::endl;
+  // particles_ = particles_tmp_;
   NormalizeWeights();
   CalculateParticleMean();
 
@@ -627,6 +650,7 @@ LogParticles();
 LogMeanState();
 LogErrorCovariance();
 LogTime();
+LogWeights();
 
 // std::cerr << "logged initial data" << std::endl;
 
@@ -685,6 +709,7 @@ while (t_ < tf_) {
   LogMeanState();
   LogErrorCovariance();
   LogTime();
+  LogWeights();
 }
 
 std::cout << "x: " << std::endl << x_ << std::endl;

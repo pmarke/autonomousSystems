@@ -61,17 +61,45 @@ State(const State& other) {
 
   for (unsigned int k = 0; k < num_landmarks_; k++) {
 
-    landmarks_.emplace_back(stacked_states_.data()+3+2*k,2);
+    // landmarks_.emplace_back(stacked_states_.data()+3+2*k,2);
+    landmarks_.emplace_back(stacked_states_.data()+3+2*k);
 
 
-    P_.emplace_back(stacked_covariance_.data()+4*k,2,2);
+    // P_.emplace_back(stacked_covariance_.data()+4*k,2,2);
+    P_.emplace_back(stacked_covariance_.data()+4*k);
     // P_[k] << 100,0, 0, 100;
 
-    // std::cerr << "mem: " << P_[k].data() << std::endl;
+    // std::cerr << "data: " << P_[k] << std::endl;
 
 
   }
 
+}
+
+// ~State() {
+//   // delete stacked_states_;
+//   stacked_states_.resize(0);
+//   // delete stacked_covariance_;
+//   stacked_covariance_.resize(0);
+//   // std::cerr << "here de: " << std::endl;
+
+
+//   for (unsigned int k = 0; k < num_landmarks_; k++) {
+
+//     new (&landmarks_[k]) Eigen::Map<Eigen::Vector2f>(NULL,2);
+
+
+//     new (&P_[k]) Eigen::Map<Eigen::Matrix2f>(NULL,2,2);
+//     // P_[k] << 100,0, 0, 100;
+
+//     // std::cerr << "data: " << P_[k] << std::endl;
+
+
+//   }
+// }
+
+State& operator=(State other) {
+  std::cerr << "here " << std::endl;
 }
 
 State(const Eigen::Vector3f& x, int num_landmarks, int num_particles) {
@@ -92,10 +120,12 @@ State(const Eigen::Vector3f& x, int num_landmarks, int num_particles) {
   
   for (unsigned int k = 0; k < num_landmarks_; k++) {
 
-    landmarks_.emplace_back(stacked_states_.data()+3+2*k,2);
+    // landmarks_.emplace_back(stacked_states_.data()+3+2*k,2);
+    landmarks_.emplace_back(stacked_states_.data()+3+2*k);
 
 
-    P_.emplace_back(stacked_covariance_.data()+4*k,2,2);
+    // P_.emplace_back(stacked_covariance_.data()+4*k,2,2);
+    P_.emplace_back(stacked_covariance_.data()+4*k);
     P_[k] << 100,0, 0, 100;
 
 
@@ -150,6 +180,7 @@ void LogMeanState();
 void LogErrorCovariance();
 void LogMeasurement(const Eigen::Vector2f& z);
 void LogTime();
+void LogWeights();
 
 // Sets the location of the x an y position of the landmark in 
 // vector x specified by landmark_id
