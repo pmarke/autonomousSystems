@@ -1,4 +1,4 @@
-function [mapF,mapP] = mdp(map,mapI)
+function [mapF,mapP] = mdp(map,mapI,iterations)
 
 mapF = mapI;
 gamma = 1;        % Discount factor;
@@ -16,7 +16,7 @@ mapF(end,:) = mapF(end-1,:);
 map_size = size(mapI);
 mapP = zeros(map_size);    % Policy map;
 
-iterations = 200;
+
 
 for ii = 1:iterations
     for rr = 2:map_size(1)-1

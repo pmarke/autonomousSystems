@@ -43,9 +43,9 @@ goal = goal | goal;
 walls = logical(walls);
 
 mapI = zeros(Np,Np);
-mapI(obsT) = -5000;
+mapI(obsT) = -50;
 mapI(walls) = -100;
-mapI(goal) = 100000;
+mapI(goal) = 1000;
 
 % Plot map
 % Sort through the cells to determine the x-y locations of occupied cells
@@ -63,7 +63,7 @@ ym = [];
 
  
 
-[mapF,mapP] = mdp(map,mapI,200);
+[mapF,mapP] = mdp(map,mapI,300);
 
 mapP(obsT) = -1;
 mapP(walls) = -1;
@@ -91,9 +91,9 @@ while(~there)
    
    xP = [xP,xc];
    yP = [yP,yc];
-   xc
-   yc 
-   policy
+%    xc
+%    yc 
+%    policy
    
    if(mapP(yc,xc) == 1)
        there = true;

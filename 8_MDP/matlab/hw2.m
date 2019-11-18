@@ -23,18 +23,23 @@ walls(N+1,2:N+1) = true;
 walls(2:N+1,N+1) = true;
 
 % Create single obstacle
-obs1(20:40,30:80) = true;
-obs1(10:20,60:65) = true;
+obs1(92:95,6:100) = true;
+obs1(6:92,6:10)=true;
+obs1(6:10,14:96)=true;
+% obs1(10:20,60:65) = true;
 
 % Another obstacle
-obs2(45:65,10:45) = true;
+obs2(14:88,14:18) = true;
+obs2(84:88,18:48) = true;
+obs2(14:18,18:40) = true;
+obs2(10:26,44:48) = true;
 
 % Another obstacle
-obs3(43:92,75:85) = true;
+obs3(14:92,92:96) = true;
 obs3(70:80,50:75) = true;
 
 % The goal states
-goal(75:80,96:98) = true;
+goal(96:99,96:99) = true;
 
 % Put walls and obstacles into map
 map = walls | obs1 | obs2 | obs3 | goal;
@@ -43,9 +48,9 @@ goal = goal | goal;
 walls = logical(walls);
 
 mapI = zeros(Np,Np);
-mapI(obsT) = -5000;
+mapI(obsT) = -500;
 mapI(walls) = -100;
-mapI(goal) = 100000;
+mapI(goal) = 1000;
 
 % Plot map
 % Sort through the cells to determine the x-y locations of occupied cells
@@ -63,7 +68,8 @@ ym = [];
 
  
 
-[mapF,mapP] = mdp(map,mapI,200);
+[mapF,mapP] = mdp(map,mapI,5000);
+% mapF = mapI;
 
 mapP(obsT) = -1;
 mapP(walls) = -1;
@@ -71,11 +77,11 @@ mapP(goal) = 1;
 
 %%
 
-% Calculate path from starting point (28,20)
-xP = [28];
-yP = [20];
-xc = 28;
-yc = 20;
+% Calculate path from starting point (98,86)
+xP = [98];
+yP = [86];
+xc = xP;
+yc = yP;
 there = false;
 while(~there)
    policy = mapP(yc,xc);
@@ -116,7 +122,7 @@ axis('square');
 % Plot values
 figure(2); clf;
 bar3(mapF);
-
+% 
 % Plot policy
 figure(3);clf;
 hold on;
