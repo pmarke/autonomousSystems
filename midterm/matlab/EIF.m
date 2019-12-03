@@ -27,8 +27,10 @@ classdef EIF < handle
                       0,    0.1^2];
             
             % Process noise covariance
-            obj.ep = [0.15^2, 0;...
-                        0,     0.1^2];
+%             obj.ep = [0.15^2, 0;...
+%                         0,     0.1^2];
+            obj.ep = [0.3^2, 0;...
+                        0,     0.2^2];
                     
             obj.UpdateHistory();
             

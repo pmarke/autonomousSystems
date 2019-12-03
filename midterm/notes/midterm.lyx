@@ -511,14 +511,10 @@ sideways false
 status collapsed
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
 \align center
 \begin_inset Graphics
 	filename images/InformationVector.pdf
-	width 95col%
+	width 100col%
 
 \end_inset
 
@@ -550,14 +546,10 @@ sideways false
 status collapsed
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
 \align center
 \begin_inset Graphics
 	filename images/EstVSTrue.pdf
-	width 95col%
+	width 100col%
 
 \end_inset
 
@@ -592,7 +584,7 @@ status collapsed
 \align center
 \begin_inset Graphics
 	filename images/error.pdf
-	width 95col%
+	width 100col%
 
 \end_inset
 
@@ -631,7 +623,7 @@ status collapsed
 \align center
 \begin_inset Graphics
 	filename images/map.pdf
-	width 95col%
+	width 100col%
 
 \end_inset
 

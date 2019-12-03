@@ -96,6 +96,8 @@ plot(t,2*P_std(1,:),'b');
 plot(t,-2*P_std(1,:),'b');
 legend('error (m)','2*std');
 title('x pos error')
+ylim([-0.2,0.2])
+xlabel("time (s)")
 
 subplot(3,1,2)
 plot(t,error_y,'r');
@@ -104,6 +106,8 @@ plot(t,2*P_std(2,:),'b');
 plot(t,-2*P_std(2,:),'b');
 legend('error (m)','2*std');
 title('y pos error')
+ylim([-0.2,0.2])
+xlabel("time (s)")
 
 subplot(3,1,3)
 plot(t,error_th,'r');
@@ -112,8 +116,10 @@ plot(t,2*P_std(3,:),'b');
 plot(t,-2*P_std(3,:),'b');
 legend('error (rads)','2*std');
 title('th error')
+ylim([-0.2,0.2])
+xlabel("time (s)")
 
-flag_save_plots = true;
+flag_save_plots = false;
 font_size = 10;
 
 filepath = '/home/mark/projects/autonomousSystems/midterm/notes/images';
