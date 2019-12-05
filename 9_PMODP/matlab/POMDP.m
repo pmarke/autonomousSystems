@@ -69,9 +69,35 @@ ylim([0,100])
 x = 1;   % Initial state
 b = 0.6; % Initial belief
 
+
+finished = false;
+
+while(~finished)
+
+% Take measurement
+r = rand(1);       % generate random number
+if (r > 0.7)       % observed correctly
+    
+    if (x ==1)
+        b = 0.7*b/(0.4*b+0.3);
+    else
+        b = 0.3*b/(0.7-0.4*b);
+    end
+
+else
+    
+    if (x==1)
+        b = 0.3*b/(0.4*b+0.3);
+    else
+        b = 0.7*b/(0.7-0.4*b);
+    end
+    
+    
+    
+end
+
 % Get policy
 [v,policy] = max(V*[b;1-b]);
-
 
 % Take action
 if policy == 1         % action 1
@@ -100,6 +126,8 @@ else                   % action 3
     end
     
     % Update belief
-    
+    b = 0.8-0.6*b;
+
+end
 
 end
