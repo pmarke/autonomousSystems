@@ -447,20 +447,79 @@ Robot Kinematics
 
 \end_layout
 
-\begin_layout Columns
-
-\end_layout
-
-\begin_deeper
-\begin_layout Column
-\begin_inset ERT
+\begin_layout Frame
+\begin_inset Box Frameless
+position "c"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "45col%"
+special "none"
+height "1in"
+height_special "totalheight"
 status open
 
 \begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/Kinematics2.pdf
+	width 100col%
 
-.4
-\backslash
-textwidth
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Box Frameless
+position "c"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "45col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+First Method: Independent rotation and translation
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\[
+x_{k}=x_{k^{-}}+\Delta t\dot{x}_{k}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+where 
+\begin_inset Formula 
+\[
+x=\begin{bmatrix}x\\
+y\\
+\theta
+\end{bmatrix}
+\]
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -468,30 +527,20 @@ textwidth
 
 \end_layout
 
-\end_deeper
-\begin_layout Columns
-
-\end_layout
-
-\begin_deeper
-\begin_layout Column
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-.4
-\backslash
-textwidth
-\end_layout
-
-\end_inset
-
- 
-\end_layout
-
-\end_deeper
 \begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Robot Kinematics Cont
+\end_layout
+
+\end_inset
+
 
 \end_layout
 
