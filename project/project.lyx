@@ -29,7 +29,7 @@
 \use_hyperref false
 \papersize default
 \use_geometry true
-\use_package amsmath 1
+\use_package amsmath 2
 \use_package amssymb 1
 \use_package cancel 1
 \use_package esint 1
@@ -82,7 +82,7 @@ Autonomous System's Project
 \end_layout
 
 \begin_layout Author
-Jake Johnson and Mark Petersen
+Mark Petersen and Jake Johnson
 \end_layout
 
 \begin_layout Institute
@@ -109,6 +109,152 @@ Table of Contents
 \begin_layout Frame
 \begin_inset CommandInset toc
 LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Section
+Lie Group Theory
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Lie Algebra
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Box Frameless
+position "c"
+hor_pos "c"
+has_inner_box 1
+inner_pos "c"
+use_parbox 0
+use_makebox 0
+width "40col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figures/LieGroupLieAlgebra.png
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Box Frameless
+position "c"
+hor_pos "c"
+has_inner_box 1
+inner_pos "c"
+use_parbox 0
+use_makebox 0
+width "50col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\begin{align*}
+\mathcal{X}\in SE\left(2\right) & \triangleq\begin{bmatrix}R_{2\times2} & t_{2\times1}\\
+0_{1\times2} & 1_{1\times1}
+\end{bmatrix}\\
+\tau^{\wedge}\in\mathfrak{se}\left(2\right) & \triangleq\begin{bmatrix}\left[\omega\right]_{\times} & \rho\\
+0 & 0
+\end{bmatrix}\\
+\tau\in\mathbb{R}^{3} & \triangleq\begin{bmatrix}\rho\\
+\omega
+\end{bmatrix}\\
+\wedge:\mathbb{R}^{3}\to\mathfrak{se}\left(2\right) & \triangleq\left(\tau\right)^{\wedge}\\
+\vee:\mathfrak{se}\left(2\right)\to\mathbb{R}^{3} & \triangleq\left(\tau^{\wedge}\right)^{\vee}\\
+\exp:\mathfrak{se}\left(2\right)\to SE\left(2\right) & \triangleq\exp\left(\tau^{\wedge}\right)\\
+\log:SE\left(2\right)\to\mathfrak{se}\left(2\right) & \triangleq\log\left(\mathcal{X}\right)
+\end{align*}
+
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Sola2018,Barfoot2019"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+More Operators and Matrix Adjoint
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\boxplus:SE\left(2\right)\times\mathbb{R}^{3}\to\mathbb{R}^{3};\quad & \mathcal{X}_{1}=\mathcal{X}_{2}\boxplus\tau\triangleq\mathcal{X}_{2}\exp\left(\tau^{\wedge}\right)\in SE\left(2\right)\\
+\boxminus:SE\left(2\right)\times SE\left(2\right)\to\mathbb{R}^{3};\quad\:\, & \tau=\mathcal{X}_{1}\boxminus\mathcal{X}_{2}\triangleq\log\left(\mathcal{X}_{2}^{-1}\mathcal{X}_{1}\right)^{\vee}\in\mathbb{R}^{3}\\
+\oplus:G\times\mathfrak{g}\to\mathfrak{g};\qquad & \mathcal{X}_{1}=\mathcal{X}_{2}\oplus\tau^{\wedge}\triangleq\mathcal{X}_{2}\exp\left(\tau^{\wedge}\right)\in SE\left(2\right)\\
+\ominus:G\times G\to\mathfrak{g};\qquad & \mathcal{X}_{1}\ominus\mathcal{X}_{2}\triangleq\log\left(\mathcal{X}_{2}^{-1}\mathcal{X}_{1}\right)\in\mathfrak{se}\left(2\right)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+The matrix adjoint at 
+\begin_inset Formula $\mathcal{X}$
+\end_inset
+
+ is 
+\begin_inset Formula 
+\[
+\mathbf{Ad}_{\mathcal{X}}=\begin{bmatrix}R & -\left[1\right]_{\times}P\\
+0 & 1
+\end{bmatrix}
+\]
 
 \end_inset
 
@@ -370,15 +516,22 @@ status open
 Virtual Measurements
 \end_layout
 
-\begin_layout Itemize
-\begin_inset Formula $\tilde{x}_{j/b}^{b}=r\cos\left(\phi\right)\sim\mathcal{N}\left(0,\sigma_{\phi}^{2}+\sigma_{r}^{2}\right)$
-\end_inset
+\begin_layout Plain Layout
+\begin_inset Formula 
+\begin{align*}
+\begin{bmatrix}\tilde{x}_{j/b}^{b}\\
+\tilde{y}_{j/b}^{b}
+\end{bmatrix} & =\begin{bmatrix}r\cos\left(\phi\right)\\
+r\sin\left(\phi\right)
+\end{bmatrix}\sim\mathcal{N}\left(0,Q\right)\\
+Q & =M\begin{bmatrix}\sigma_{r}^{2} & 0\\
+0 & \sigma_{r}^{2}
+\end{bmatrix}M^{\top}\\
+M & =\begin{bmatrix}\cos\left(\phi\right) & -r\sin\left(\phi\right)\\
+\sin\left(\phi\right) & r\cos\left(\phi\right)
+\end{bmatrix}
+\end{align*}
 
-
-\end_layout
-
-\begin_layout Itemize
-\begin_inset Formula $\tilde{y}_{j/b}^{b}=r\sin\left(\phi\right)\sim\mathcal{N}\left(0,\sigma_{\phi}^{2}+\sigma_{r}^{2}\right)$
 \end_inset
 
 
@@ -544,32 +697,844 @@ Robot Kinematics Cont
 
 \end_layout
 
+\begin_layout Frame
+\begin_inset Box Frameless
+position "c"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "45col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/Kinematics.pdf
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Box Frameless
+position "c"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "45col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+Second Method: Simultaneous rotation and translation
+\end_layout
+
+\begin_layout Plain Layout
+Let 
+\begin_inset Formula $\mathcal{X}\in SE\left(2\right)$
+\end_inset
+
+ then 
+\begin_inset Formula 
+\[
+\mathcal{X}\triangleq\begin{bmatrix}R_{2\times2} & t_{2\times1}\\
+0_{1\times2} & 1_{1\times1}
+\end{bmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+The derivative of 
+\begin_inset Formula $\mathcal{X}$
+\end_inset
+
+ is 
+\begin_inset Formula 
+\[
+\dot{\mathcal{X}}=\mathcal{X}\underbrace{\begin{bmatrix}\left[\omega\right]_{\times} & \rho\\
+0 & 0
+\end{bmatrix}}_{\tau^{\wedge}\in\mathfrak{se}\left(2\right)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+so that 
+\begin_inset Formula 
+\[
+\mathcal{X}_{k}=\mathcal{X}_{k^{-}}\exp\left(\delta\tau^{\wedge}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Separator
+
+\end_layout
+
 \begin_layout Section
-Numerical Integration
+Numerical Integration Comparison
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Numerical Integration Comparison
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Box Frameless
+position "c"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "45col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/NumericalIntegration.pdf
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset space \hfill{}
+\end_inset
+
+
+\begin_inset Box Frameless
+position "c"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "50col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+The velocity in the body frame
+\begin_inset Formula 
+\[
+\tau=\begin{bmatrix}10\\
+0\\
+\frac{\pi}{2}
+\end{bmatrix}
+\]
+
+\end_inset
+
+with time step 
+\begin_inset Formula $\delta=0.1s$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+Manifold: 
+\begin_inset Formula $\mathcal{X}_{k}=\mathcal{X}_{k^{-}}\exp\left(\delta\tau^{\wedge}\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Euler First Order: 
+\begin_inset Formula $x_{k}=x_{k^{-}}+\delta\dot{x}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Runge-Kutta 4: 
+\begin_inset Formula $x_{k}=x_{k^{-}}+RK4\left(x_{k^{-}},\tau\right)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Section
+Error State
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Error State
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+The error state is a minimal representation used to show uncertainty.
+ 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\mathcal{X}$
+\end_inset
+
+: True state
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\hat{\mathcal{X}}$
+\end_inset
+
+: Estimated state
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\delta\mathcal{X}$
+\end_inset
+
+: Error
+\end_layout
+
+\begin_layout Plain Layout
+The error is defined as 
+\begin_inset Formula 
+\[
+\delta\mathcal{X}=\mathcal{X}\boxminus\mathcal{\hat{X}}\sim\mathcal{N}\left(0,P\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+
+\end_layout
+
+\begin_layout Separator
+
 \end_layout
 
 \begin_layout Section
 Uncertainty Representation
 \end_layout
 
-\begin_layout Section
-D-LG-EKF
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Uncertainty Representation Unicycle
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Box Frameless
+position "c"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\align center
+Unicycle Propagation
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\begin{align*}
+\dot{x} & =\begin{bmatrix}v_{x}\\
+v_{y}\\
+\omega
+\end{bmatrix}+w_{k},\,w_{k}\sim\mathcal{N}\left(0,Q\right)\\
+x_{k} & =x_{k^{-}}+\delta\begin{bmatrix}v_{x}\\
+v_{y}\\
+\omega
+\end{bmatrix}+\delta w_{k}\\
+E\left[x_{k}\right] & =x_{k^{-}}+\delta\begin{bmatrix}v_{x}\\
+v_{y}\\
+\omega
+\end{bmatrix}\\
+\text{cov}\left(x_{k}\right) & =P_{k^{-}}+\delta^{2}Q
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Uncertainty Representation Manifold
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\align center
+Manifold Propagation
+\begin_inset Formula 
+\begin{align*}
+\delta\mathcal{X}_{k} & =F\delta\mathcal{X}_{k^{-}}+Gw_{k}\\
+\text{E}\left[\delta\mathcal{X}_{k}\right] & =0\\
+\text{\text{cov}\left(\delta\mathcal{X}_{k}\right)} & =FP_{k^{-}}F^{\top}+GWG^{\top}
+\end{align*}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\[
+F=\textbf{Ad}_{\exp u_{k}}^{-1}\quad G=J_{r}\left(u_{k}\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Separator
+
 \end_layout
 
 \begin_layout Section
 Banana Distribution
 \end_layout
 
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Banana Distribution
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset CommandInset href
+LatexCommand href
+name "Banana!!!!!!"
+target "https://www.youtube.com/watch?v=OWjAjHdGP78&list=PLj6HahJg1Z-y5etl0aWNjLOo51IpdFWkE&index=4"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+
+\end_layout
+
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Section
+D-LG-EKF
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+D-LG-EKF
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+Prediction step 
+\begin_inset Formula 
+\begin{align}
+\hat{\mathcal{X}}_{k|\ell^{-}} & =\hat{\mathcal{X}}_{k^{-}|\ell^{-}}\boxplus\left(u_{k}\right)\\
+P_{k|\ell^{-}} & =FP_{k^{-}|\ell^{-}}F^{\top}+GWG^{\top}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Update step
+\begin_inset Formula 
+\begin{align}
+\text{Innovation}: & \hfill z=y_{k,j}-\hat{\mathcal{X}}_{k|\ell^{-}}^{-1}b_{j}\\
+\text{Innovation Covariance}: & \hfill Z=HP_{k|\ell^{-}}H^{\top}+R\\
+\text{Kalman Gain:} & \hfill K=P_{k|\ell^{-}}H^{\top}Z^{-1}\\
+\text{Observed Error:} & \hfill\delta\mathcal{X}=Kz\\
+\text{State Update:} & \hfill\mathcal{X}_{k|\ell}=\mathcal{X}_{k|\ell^{-}}\boxplus\delta\mathcal{X}\\
+\text{Cov Update:} & \hfill P_{k|\ell}=P_{k|\ell^{-}}-KZK^{\top}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+where 
+\begin_inset Formula 
+\[
+H=-\begin{bmatrix}I & R^{\top}\left[1\right]_{\times}\left(b_{k}-t\right)\end{bmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+
+\end_layout
+
+\begin_layout Separator
+
+\end_layout
+
 \begin_layout Section
 Simulation
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Simulation
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset CommandInset href
+LatexCommand href
+name "Sim"
+target "https://www.youtube.com/watch?v=b2m99rpb3fQ&list=PLj6HahJg1Z-y5etl0aWNjLOo51IpdFWkE&index=2"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/eskf_states.pdf
+	width 100text%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Separator
+
 \end_layout
 
 \begin_layout Section
 Hardware
 \end_layout
 
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Hardware
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\begin_inset CommandInset href
+LatexCommand href
+name "Hardware"
+target "https://www.youtube.com/watch?v=jFeJlrKWcM8&list=PLj6HahJg1Z-y5etl0aWNjLOo51IpdFWkE&index=3"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/tb_pos.pdf
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/tb_error.pdf
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Separator
+
+\end_layout
+
 \begin_layout Section
 Conclusion
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+Conclusion
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Itemize
+Key accomplishments
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Learned and applied basic Lie Group theory
+\end_layout
+
+\begin_layout Itemize
+Compared manifold method vs non-manifold method
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Take away
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Still unsure if manifold method vs non-manifold method is 
+\begin_inset Quotes eld
+\end_inset
+
+better
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Future considerations
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Would better hardware data show different results?
+\end_layout
+
+\end_deeper
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+
+\end_layout
+
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Section
+References
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+References
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+bibfiles "/home/mark/Documents/mendeley/library"
+options "plain"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Separator
+
 \end_layout
 
 \end_body
