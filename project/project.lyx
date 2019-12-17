@@ -3,6 +3,9 @@
 \begin_document
 \begin_header
 \textclass beamer
+\begin_preamble
+
+\end_preamble
 \use_default_options true
 \maintain_unincluded_children false
 \language english
@@ -128,7 +131,54 @@ Lie Group Theory
 status open
 
 \begin_layout Plain Layout
-Lie Algebra
+Lie Group and Lie Algebra Relation
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Box Frameless
+position "t"
+hor_pos "c"
+has_inner_box 1
+inner_pos "t"
+use_parbox 0
+use_makebox 0
+width "100col%"
+special "none"
+height "1in"
+height_special "totalheight"
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figures/LieGroupLieAlgebra.png
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Frame
+\begin_inset Argument 4
+status open
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \end_inset
@@ -144,37 +194,7 @@ has_inner_box 1
 inner_pos "c"
 use_parbox 0
 use_makebox 0
-width "40col%"
-special "none"
-height "1in"
-height_special "totalheight"
-status open
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename figures/LieGroupLieAlgebra.png
-	width 100col%
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\begin_inset space \hfill{}
-\end_inset
-
-
-\begin_inset Box Frameless
-position "c"
-hor_pos "c"
-has_inner_box 1
-inner_pos "c"
-use_parbox 0
-use_makebox 0
-width "50col%"
+width "100col%"
 special "none"
 height "1in"
 height_special "totalheight"
@@ -224,7 +244,7 @@ key "Sola2018,Barfoot2019"
 status open
 
 \begin_layout Plain Layout
-More Operators and Matrix Adjoint
+More Operators 
 \end_layout
 
 \end_inset
@@ -233,9 +253,7 @@ More Operators and Matrix Adjoint
 \begin_inset Formula 
 \begin{align*}
 \boxplus:SE\left(2\right)\times\mathbb{R}^{3}\to\mathbb{R}^{3};\quad & \mathcal{X}_{1}=\mathcal{X}_{2}\boxplus\tau\triangleq\mathcal{X}_{2}\exp\left(\tau^{\wedge}\right)\in SE\left(2\right)\\
-\boxminus:SE\left(2\right)\times SE\left(2\right)\to\mathbb{R}^{3};\quad\:\, & \tau=\mathcal{X}_{1}\boxminus\mathcal{X}_{2}\triangleq\log\left(\mathcal{X}_{2}^{-1}\mathcal{X}_{1}\right)^{\vee}\in\mathbb{R}^{3}\\
-\oplus:G\times\mathfrak{g}\to\mathfrak{g};\qquad & \mathcal{X}_{1}=\mathcal{X}_{2}\oplus\tau^{\wedge}\triangleq\mathcal{X}_{2}\exp\left(\tau^{\wedge}\right)\in SE\left(2\right)\\
-\ominus:G\times G\to\mathfrak{g};\qquad & \mathcal{X}_{1}\ominus\mathcal{X}_{2}\triangleq\log\left(\mathcal{X}_{2}^{-1}\mathcal{X}_{1}\right)\in\mathfrak{se}\left(2\right)
+\boxminus:SE\left(2\right)\times SE\left(2\right)\to\mathbb{R}^{3};\quad\:\, & \tau=\mathcal{X}_{1}\boxminus\mathcal{X}_{2}\triangleq\log\left(\mathcal{X}_{2}^{-1}\mathcal{X}_{1}\right)^{\vee}\in\mathbb{R}^{3}
 \end{align*}
 
 \end_inset
@@ -251,13 +269,29 @@ The matrix adjoint at
  is 
 \begin_inset Formula 
 \[
-\mathbf{Ad}_{\mathcal{X}}=\begin{bmatrix}R & -\left[1\right]_{\times}t\\
+\mathbf{Ad}_{\mathcal{X}}\triangleq\begin{bmatrix}R & -\left[1\right]_{\times}t\\
 0 & 1
 \end{bmatrix}
 \]
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Frame
+The group operator is 
+\begin_inset Formula 
+\[
+\left(\cdot\right):SE\left(2\right)\times\mathbb{R}^{2}\to\mathbb{R}^{2};\quad\mathcal{X}\cdot b\triangleq Rb+t
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Frame
 
 \end_layout
 
@@ -457,18 +491,11 @@ status open
 
 \begin_layout Plain Layout
 \align center
-Real Measurements
+Beacon
 \end_layout
 
-\begin_layout Itemize
-\begin_inset Formula $r\sim\mathcal{N}\left(0,\sigma_{r}^{2}\right)$
-\end_inset
-
-
-\end_layout
-
-\begin_layout Itemize
-\begin_inset Formula $\phi\sim\mathcal{N}\left(0,\sigma_{\phi}^{2}\right)$
+\begin_layout Plain Layout
+\begin_inset Formula $b_{j/b}^{b}=\left[x_{j/b}^{b},y_{j/b}^{b}\right]^{\top}$
 \end_inset
 
 
@@ -505,7 +532,7 @@ has_inner_box 1
 inner_pos "t"
 use_parbox 0
 use_makebox 0
-width "60col%"
+width "30col%"
 special "none"
 height "1in"
 height_special "totalheight"
@@ -513,25 +540,18 @@ status open
 
 \begin_layout Plain Layout
 \align center
-Virtual Measurements
+Real Measurements
 \end_layout
 
-\begin_layout Plain Layout
-\begin_inset Formula 
-\begin{align*}
-\begin{bmatrix}\tilde{x}_{j/b}^{b}\\
-\tilde{y}_{j/b}^{b}
-\end{bmatrix} & =\begin{bmatrix}r\cos\left(\phi\right)\\
-r\sin\left(\phi\right)
-\end{bmatrix}\sim\mathcal{N}\left(0,Q\right)\\
-Q & =M\begin{bmatrix}\sigma_{r}^{2} & 0\\
-0 & \sigma_{\phi}^{2}
-\end{bmatrix}M^{\top}\\
-M & =\begin{bmatrix}\cos\left(\phi\right) & -r\sin\left(\phi\right)\\
-\sin\left(\phi\right) & r\cos\left(\phi\right)
-\end{bmatrix}
-\end{align*}
+\begin_layout Itemize
+\begin_inset Formula $r\sim\mathcal{N}\left(\bar{r},\sigma_{r}^{2}\right)$
+\end_inset
 
+
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\phi\sim\mathcal{N}\left(\bar{\phi},\sigma_{\phi}^{2}\right)$
 \end_inset
 
 
@@ -551,7 +571,7 @@ has_inner_box 1
 inner_pos "t"
 use_parbox 0
 use_makebox 0
-width "30col%"
+width "65col%"
 special "none"
 height "1in"
 height_special "totalheight"
@@ -559,11 +579,25 @@ status open
 
 \begin_layout Plain Layout
 \align center
-Beacon
+Virtual Measurements
 \end_layout
 
 \begin_layout Plain Layout
-\begin_inset Formula $b_{j/b}^{b}=\left[\tilde{x}_{j/b}^{b},\tilde{y}_{j/b}^{b}\right]^{\top}$
+\begin_inset Formula 
+\begin{align*}
+\begin{bmatrix}\hat{x}_{j/b}^{b}\\
+\hat{y}_{j/b}^{b}
+\end{bmatrix} & =\begin{bmatrix}r\cos\left(\phi\right)\\
+r\sin\left(\phi\right)
+\end{bmatrix}\sim\mathcal{N}\left(\bar{B},Q\right)\\
+Q & =M\begin{bmatrix}\sigma_{r}^{2} & 0\\
+0 & \sigma_{\phi}^{2}
+\end{bmatrix}M^{\top}\\
+M & =\begin{bmatrix}\cos\left(\phi\right) & -r\sin\left(\phi\right)\\
+\sin\left(\phi\right) & r\cos\left(\phi\right)
+\end{bmatrix}
+\end{align*}
+
 \end_inset
 
 
@@ -1101,7 +1135,7 @@ Manifold Propagation
 \begin{align*}
 \delta\mathcal{X}_{k} & =F\delta\mathcal{X}_{k^{-}}+Gw_{k}\\
 \text{E}\left[\delta\mathcal{X}_{k}\right] & =0\\
-\text{\text{cov}\left(\delta\mathcal{X}_{k}\right)} & =FP_{k^{-}}F^{\top}+GWG^{\top}
+\text{\text{cov}\left(\delta\mathcal{X}_{k}\right)} & =FP_{k^{-}}F^{\top}+GQG^{\top}
 \end{align*}
 
 \end_inset
@@ -1198,7 +1232,7 @@ Prediction step
 \begin_inset Formula 
 \begin{align}
 \hat{\mathcal{X}}_{k|\ell^{-}} & =\hat{\mathcal{X}}_{k^{-}|\ell^{-}}\boxplus\left(u_{k}\right)\\
-P_{k|\ell^{-}} & =FP_{k^{-}|\ell^{-}}F^{\top}+GWG^{\top}
+P_{k|\ell^{-}} & =FP_{k^{-}|\ell^{-}}F^{\top}+GQG^{\top}
 \end{align}
 
 \end_inset
@@ -1210,7 +1244,7 @@ P_{k|\ell^{-}} & =FP_{k^{-}|\ell^{-}}F^{\top}+GWG^{\top}
 Update step
 \begin_inset Formula 
 \begin{align}
-\text{Innovation}: & \hfill z=y_{k,j}-\hat{\mathcal{X}}_{k|\ell^{-}}^{-1}b_{j}\\
+\text{Innovation}: & \hfill z=y_{k,j}-\hat{\mathcal{X}}_{k|\ell^{-}}^{-1}\cdot b_{j}\\
 \text{Innovation Covariance}: & \hfill Z=HP_{k|\ell^{-}}H^{\top}+R\\
 \text{Kalman Gain:} & \hfill K=P_{k|\ell^{-}}H^{\top}Z^{-1}\\
 \text{Observed Error:} & \hfill\delta\mathcal{X}=Kz\\
