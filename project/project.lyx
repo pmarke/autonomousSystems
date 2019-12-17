@@ -251,7 +251,7 @@ The matrix adjoint at
  is 
 \begin_inset Formula 
 \[
-\mathbf{Ad}_{\mathcal{X}}=\begin{bmatrix}R & -\left[1\right]_{\times}P\\
+\mathbf{Ad}_{\mathcal{X}}=\begin{bmatrix}R & -\left[1\right]_{\times}t\\
 0 & 1
 \end{bmatrix}
 \]
@@ -525,7 +525,7 @@ Virtual Measurements
 r\sin\left(\phi\right)
 \end{bmatrix}\sim\mathcal{N}\left(0,Q\right)\\
 Q & =M\begin{bmatrix}\sigma_{r}^{2} & 0\\
-0 & \sigma_{r}^{2}
+0 & \sigma_{\phi}^{2}
 \end{bmatrix}M^{\top}\\
 M & =\begin{bmatrix}\cos\left(\phi\right) & -r\sin\left(\phi\right)\\
 \sin\left(\phi\right) & r\cos\left(\phi\right)
@@ -652,7 +652,7 @@ First Method: Independent rotation and translation
 \begin_layout Plain Layout
 \begin_inset Formula 
 \[
-x_{k}=x_{k^{-}}+\Delta t\dot{x}_{k}
+x_{k}=x_{k^{-}}+\delta\dot{x}_{k}
 \]
 
 \end_inset
@@ -1214,7 +1214,7 @@ Update step
 \text{Innovation Covariance}: & \hfill Z=HP_{k|\ell^{-}}H^{\top}+R\\
 \text{Kalman Gain:} & \hfill K=P_{k|\ell^{-}}H^{\top}Z^{-1}\\
 \text{Observed Error:} & \hfill\delta\mathcal{X}=Kz\\
-\text{State Update:} & \hfill\mathcal{X}_{k|\ell}=\mathcal{X}_{k|\ell^{-}}\boxplus\delta\mathcal{X}\\
+\text{State Update:} & \hfill\hat{\mathcal{X}}_{k|\ell}=\mathcal{\hat{X}}_{k|\ell^{-}}\boxplus\delta\mathcal{X}\\
 \text{Cov Update:} & \hfill P_{k|\ell}=P_{k|\ell^{-}}-KZK^{\top}
 \end{align}
 
